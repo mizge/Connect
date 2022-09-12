@@ -1,0 +1,29 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.vs
+
+# FE
+# dependencies
+/Connect-Frontend/node_modules
+/Connect-Frontend/.pnp
+/Connect-Frontend/.pnp.js
+
+# testing
+/Connect-Frontend/coverage
+
+# production
+/Connect-Frontend/build
+
+# misc
+/Connect-Frontend/.DS_Store
+/Connect-Frontend/.env.local
+/Connect-Frontend/.env.development.local
+/Connect-Frontend/.env.test.local
+/Connect-Frontend/.env.production.local
+
+/Connect-Frontend/npm-debug.log*
+/Connect-Frontend/yarn-debug.log*
+/Connect-Frontend/yarn-error.log*
+/Connect-Frontend/obj
+# BE
+/Connect-Backend/bin
+/Connect-Backend/obj
