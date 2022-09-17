@@ -16,6 +16,9 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "ConnectionStrings": {
+      "Default": "server=YOURSERVER;user=YOURUSERID;password=YOURPASSWORD;database=YOURDATABASE"
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json",
