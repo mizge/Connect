@@ -9,7 +9,7 @@ using System.Data.Entity;
 namespace Connect_Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api")]
     public class SessionController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -30,10 +30,9 @@ namespace Connect_Backend.Controllers
                                                         .SelectMany(t => t.Sessions)
                                                         .Where(s => s.ClientId == null)
                                                         .ToList();
-
             return Ok(availableSessions);
         }
-        [HttpPost("create")]
+        [HttpPost("sessions")]
         [Authorize(Roles = "Therepuet")]
         public ActionResult CreateSession(Session sessionRequest)
         {
@@ -57,7 +56,7 @@ namespace Connect_Backend.Controllers
             _context.SaveChanges();
             return Ok("Session created.");
         }
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("sessions/{id}")]
         [Authorize(Roles = "Therepuet")]
         public ActionResult DeleteSession(int id)
         {
@@ -72,9 +71,9 @@ namespace Connect_Backend.Controllers
 
             return BadRequest("Session cannot be deleted.");
         }
-        [HttpPut("notes/{id}")]
+        [HttpPatch("session/{id}/note")]
         [Authorize(Roles = "Therepuet")]
-        public ActionResult UpdateSessionNotes(int id, [FromBody] NotesRequest notes)
+        public ActionResult UpdateSessionNote(int id, [FromBody] NotesRequest notes)
         {
             int userId = int.Parse(User.Claims.First().Value);
             bool sessionCanBeUpdated = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId != null && SessionHasEnded(s.StartTime, s.DurationInMinutes)).Any();
@@ -89,9 +88,18 @@ namespace Connect_Backend.Controllers
 
             return BadRequest("Sessions notes cannot be updated.");
         }
-        [HttpPut("reserve/{id}")]
+        [HttpPatch("session/{id}/reservation")]
         [Authorize(Roles = "Client")]
-        public ActionResult ReserveSession(int id)
+        public ActionResult UpdateSessionReservation(int id, [FromBody] ReservationRequest reservation)
+        {
+            if (reservation.IsReservation)
+            {
+                return CreateSessionReservation(id);
+            }
+            return DeleteSessionReservation(id);
+        }
+
+        private ActionResult CreateSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
             bool sessionCanBeReserved = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId == null && Is24HoursTillSession(s.StartTime)).Any();
@@ -106,9 +114,7 @@ namespace Connect_Backend.Controllers
 
             return BadRequest("Sessions cannot be reserved.");
         }
-        [HttpPut("cancel-reservation/{id}")]
-        [Authorize(Roles = "Client")]
-        public ActionResult CancelSessionReservation(int id)
+        private ActionResult DeleteSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
             Session? session = _context.Sessions.ToList().FirstOrDefault(s => s.Id == id && s.ClientId == userId && Is24HoursTillSession(s.StartTime));
