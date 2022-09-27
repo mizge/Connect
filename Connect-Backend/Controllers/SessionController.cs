@@ -1,10 +1,11 @@
-﻿
-using Connect_Backend.Data;
+﻿using Connect_Backend.Data;
 using Connect_Backend.Models;
 using Connect_Backend.Requests;
+using Connect_Backend.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.Entity;
+
 
 namespace Connect_Backend.Controllers
 {
@@ -18,9 +19,12 @@ namespace Connect_Backend.Controllers
             _context = context;
         }
         [HttpGet("qualification/{qualificationId}/therepuet/{therepuetId}/sessions")]
-        public ActionResult GetSessions(int qualificationId, int therepuetId)
+        public ActionResult GetAll(int qualificationId, int therepuetId)
         {
-
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session was found.");
+            }
             var availableSessions = _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
@@ -29,13 +33,22 @@ namespace Connect_Backend.Controllers
                                                         .Include(t => t.Sessions)
                                                         .SelectMany(t => t.Sessions)
                                                         .Where(s => s.ClientId == null)
+                                                        .Select(s => new SessionResponse(s))
                                                         .ToList();
+            if (availableSessions.Count() < 1)
+            {
+                return NotFound("No session for this therepuet is available.");
+            }
             return Ok(availableSessions);
         }
         [HttpPost("sessions")]
         [Authorize(Roles = "Therepuet")]
         public ActionResult CreateSession(Session sessionRequest)
         {
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
             int userId = int.Parse(User.Claims.First().Value);
             bool therepuetHasAnySessions = _context.Sessions.ToList().Any();
             bool sessionsTimeImpossible = _context.Sessions.ToList().Where(s => s.TherepuetId == userId &&
@@ -60,6 +73,14 @@ namespace Connect_Backend.Controllers
         [Authorize(Roles = "Therepuet")]
         public ActionResult DeleteSession(int id)
         {
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
+            if (!SessionExists(id))
+            {
+                return NotFound("No session was found.");
+            }
             int userId = int.Parse(User.Claims.First().Value);
             bool sessionCanBeDeleted = _context.Sessions.Where(s => s.Id == id && s.ClientId == null).Any();
             if (sessionCanBeDeleted)
@@ -71,10 +92,18 @@ namespace Connect_Backend.Controllers
 
             return BadRequest("Session cannot be deleted.");
         }
-        [HttpPatch("session/{id}/note")]
+        [HttpPatch("sessions/{id}/note")]
         [Authorize(Roles = "Therepuet")]
         public ActionResult UpdateSessionNote(int id, [FromBody] NotesRequest notes)
         {
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
+            if (!SessionExists(id))
+            {
+                return NotFound("No session was found.");
+            }
             int userId = int.Parse(User.Claims.First().Value);
             bool sessionCanBeUpdated = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId != null && SessionHasEnded(s.StartTime, s.DurationInMinutes)).Any();
             if (sessionCanBeUpdated)
@@ -88,10 +117,18 @@ namespace Connect_Backend.Controllers
 
             return BadRequest("Sessions notes cannot be updated.");
         }
-        [HttpPatch("session/{id}/reservation")]
+        [HttpPatch("sessions/{id}/reservation")]
         [Authorize(Roles = "Client")]
         public ActionResult UpdateSessionReservation(int id, [FromBody] ReservationRequest reservation)
         {
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
+            if (!SessionExists(id))
+            {
+                return NotFound("No session was found.");
+            }
             if (reservation.IsReservation)
             {
                 return CreateSessionReservation(id);
@@ -146,7 +183,7 @@ namespace Connect_Backend.Controllers
         }
         private int GetNewSessionId()
         {
-            Session lastUser = _context.Sessions.OrderBy(u => u.Id).LastOrDefault();
+            Session lastUser = _context.Sessions.OrderBy(u => u.Id).LastOrDefault()!;
             if (lastUser == default)
             {
                 return 1;
@@ -155,6 +192,10 @@ namespace Connect_Backend.Controllers
             {
                 return lastUser.Id + 1;
             }
+        }
+        private bool SessionExists(int id)
+        {
+            return _context.Sessions.Where(u => u.Id == id).Any();
         }
     }
 }

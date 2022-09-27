@@ -23,12 +23,14 @@ namespace Connect_Backend.Data
             base.OnModelCreating(builder);
             builder.Entity<User>().HasOne(t => t.Role).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Therepuet>().HasOne(t => t.User).WithOne().OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Therepuet>().HasMany(t => t.Sessions).WithOne(s => s.Therepuet).OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Session>().HasOne(s => s.Therepuet).WithMany(t => t.Sessions).OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Therepuet>().HasMany(t => t.Sessions).WithOne(s=> s.Therepuet).OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Session>().HasOne(s => s.Therepuet).WithMany(t => t.Sessions).HasForeignKey(s => s.TherepuetId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Session>().HasOne(s => s.Client).WithMany().OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<TherepuetsQualifications>().HasOne(x => x.Qualification).WithMany().OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<TherepuetsQualifications>().HasOne(x => x.Therepuet).WithMany().OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<TherepuetsQualifications>().HasOne(x => x.Qualification).WithMany().HasForeignKey(x=>x.QualificationId).OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<TherepuetsQualifications>().HasOne(x => x.Therepuet).WithMany().HasForeignKey(x => x.TherepuetId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TherepuetsQualifications>().HasKey(x => new { x.TherepuetId, x.QualificationId });
         }
+
+        public DbSet<Qualification> Qualifications { get; set; }
     }
 }

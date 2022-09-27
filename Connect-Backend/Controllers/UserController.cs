@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Connect_Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/user")]
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,7 +18,7 @@ namespace Connect_Backend.Controllers
             _context = context;
             _jwtUtils = jwtUtils;
         }
-        [HttpPost("register/client")]
+        [HttpPost("client")]
         public ActionResult RegisterClient(ClientRegisterRequest request)
         {
             if (EmailExists(request.Email))
@@ -41,7 +41,7 @@ namespace Connect_Backend.Controllers
             _context.SaveChanges();
             return Ok($"User created.");
         }
-        [HttpPost("register/therepuet")]
+        [HttpPost("therepuet")]
         public ActionResult RegisterTherepuet(TherepuetRegisterRequest request)
         {
             if (EmailExists(request.Email))
@@ -72,7 +72,7 @@ namespace Connect_Backend.Controllers
             _context.SaveChanges();
             return Ok($"User created.");
         }
-        [HttpPost("login")]
+        [HttpPost]
         public ActionResult Login(LoginRequest request)
         {
             if(!EmailExists(request.Email))
