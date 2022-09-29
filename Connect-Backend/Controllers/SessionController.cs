@@ -4,7 +4,7 @@ using Connect_Backend.Requests;
 using Connect_Backend.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Connect_Backend.Controllers
@@ -18,28 +18,94 @@ namespace Connect_Backend.Controllers
         {
             _context = context;
         }
-        [HttpGet("qualification/{qualificationId}/therepuet/{therepuetId}/sessions")]
-        public ActionResult GetAll(int qualificationId, int therepuetId)
+        [HttpGet("qualifications/{qualificationId}/therepuets/{therepuetId}/sessions")]
+        public async Task<IActionResult> GetAllByQualification(int qualificationId, int therepuetId)
         {
             if (_context.Sessions == null)
             {
-                return NotFound("No session was found.");
+                return NotFound("No session table was found.");
             }
-            var availableSessions = _context.TherepuetsQualifications
+            var therepuet = await _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
                                                         .Select(x => x.Therepuet)
                                                         .Where(t => t.UserId == therepuetId)
-                                                        .Include(t => t.Sessions)
-                                                        .SelectMany(t => t.Sessions)
-                                                        .Where(s => s.ClientId == null)
+                                                        .FirstOrDefaultAsync();
+            if (therepuet == default)
+            {
+                return NotFound("No session for this therepuet is available.");
+            }
+            var availableSessions = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
                                                         .Select(s => new SessionResponse(s))
-                                                        .ToList();
+                                                        .ToListAsync();
             if (availableSessions.Count() < 1)
             {
                 return NotFound("No session for this therepuet is available.");
             }
             return Ok(availableSessions);
+        }
+
+        [HttpGet("qualifications/{qualificationId}/therepuets/{therepuetId}/sessions/{sessionId}")]
+        public async Task<IActionResult> GetOneByQualification(int qualificationId, int therepuetId, int sessionId)
+        {
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
+            var therepuet = await _context.TherepuetsQualifications
+                                                        .Where(x => x.QualificationId == qualificationId)
+                                                        .Include(x => x.Therepuet)
+                                                        .Select(x => x.Therepuet)
+                                                        .Where(t => t.UserId == therepuetId)
+                                                        .FirstOrDefaultAsync();
+            if (therepuet == default)
+            {
+                return NotFound("No session for this therepuet is available.");
+            }
+            var session = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
+                                                        .Select(s => new SessionResponse(s))
+                                                        .FirstOrDefaultAsync();
+            if (session == default)
+            {
+                return NotFound("No such session was found.");
+            }
+            return Ok(session);
+        }
+        //Get therepuets/clients sessions
+        // users/{userId}/sessions
+        [HttpGet("sessions")]
+        [Authorize(Roles = "Client, Therepuet")]
+        public async Task<IActionResult> GetAllByUser()
+        {
+            int userId = int.Parse(User.Claims.First().Value);
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
+            List<Session> sessions = await _context.Sessions.Where(x => x.TherepuetId == userId || x.ClientId == userId).ToListAsync();
+            if (sessions.Count() < 1)
+            {
+                return NotFound("No session for this user was found.");
+            }
+            return Ok(sessions);
+        }
+        //Get therepuets/clients sessions
+        // users/{userId}/sessions/{sessionId}
+        [HttpGet("sessions/{sessionId}")]
+        [Authorize(Roles = "Client, Therepuet")]
+        public async Task<IActionResult> GetOneByUser(int sessionId)
+        {
+            int userId = int.Parse(User.Claims.First().Value);
+            if (_context.Sessions == null)
+            {
+                return NotFound("No session table was found.");
+            }
+            var session = await _context.Sessions.Where(x => x.Id == sessionId && (x.TherepuetId == userId || x.ClientId == userId)).FirstOrDefaultAsync();
+            if (session == default)
+            {
+                return NotFound("No such session was found.");
+            }
+            return Ok(session);
         }
         [HttpPost("sessions")]
         [Authorize(Roles = "Therepuet")]
@@ -105,7 +171,7 @@ namespace Connect_Backend.Controllers
                 return NotFound("No session was found.");
             }
             int userId = int.Parse(User.Claims.First().Value);
-            bool sessionCanBeUpdated = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId != null && SessionHasEnded(s.StartTime, s.DurationInMinutes)).Any();
+            bool sessionCanBeUpdated = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId != null && s.SessionHasEnded()).Any();
             if (sessionCanBeUpdated)
             {
                 Session session = _context.Sessions.Where(s => s.Id == id).First();
@@ -165,11 +231,7 @@ namespace Connect_Backend.Controllers
 
             return BadRequest("Sessions cannot be canceled.");
         }
-        private bool SessionHasEnded(DateTime start, int duration)
-        {
-            DateTime sessionEnd = start + TimeSpan.FromMinutes(duration);
-            return DateTime.UtcNow >= sessionEnd;
-        }
+
         private bool Is24HoursTillSession(DateTime start)
         {
             DateTime oneDayBeforeSessionStart = start - TimeSpan.FromDays(1);

@@ -14,5 +14,11 @@ namespace Connect_Backend.Models
         // Ask someone could i make it not nullabel 
         public Therepuet? Therepuet { get; set; }
         public User? Client { get; set; }
+
+        public bool SessionHasEnded()
+        {
+            DateTime sessionEnd = StartTime + TimeSpan.FromMinutes(DurationInMinutes);
+            return DateTime.UtcNow >= sessionEnd;
+        }
     }
 }

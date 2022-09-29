@@ -8,9 +8,9 @@ namespace Connect_Backend.Models
     {
         [Key]
         public int UserId { get; set; }
-        [ForeignKey("UserId")]
         public string? Description { get; set; }
+        [ForeignKey("UserId")]
         public User User { get; set; }
-        public ICollection<Session> Sessions { get; set; }
+        public ICollection<Session>? Sessions { get; set; }
     }
 }

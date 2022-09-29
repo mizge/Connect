@@ -17,6 +17,8 @@ namespace Connect_Backend.Data
         public DbSet<Session> Sessions { get; set; }
         public DbSet<Therepuet> Therepuets { get; set; }
         public DbSet<TherepuetsQualifications> TherepuetsQualifications { get; set; }
+        public DbSet<Qualification> Qualifications { get; set; }
+        public DbSet<Homework> Homeworks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -29,8 +31,7 @@ namespace Connect_Backend.Data
             builder.Entity<TherepuetsQualifications>().HasOne(x => x.Qualification).WithMany().HasForeignKey(x=>x.QualificationId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TherepuetsQualifications>().HasOne(x => x.Therepuet).WithMany().HasForeignKey(x => x.TherepuetId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TherepuetsQualifications>().HasKey(x => new { x.TherepuetId, x.QualificationId });
+            builder.Entity<Homework>().HasOne(s => s.Session).WithMany().OnDelete(DeleteBehavior.NoAction);
         }
-
-        public DbSet<Qualification> Qualifications { get; set; }
     }
 }
