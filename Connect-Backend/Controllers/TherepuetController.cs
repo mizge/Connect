@@ -1,5 +1,6 @@
-﻿using Connect_Backend.Data;
-using Connect_Backend.Responses;
+﻿using AutoMapper;
+using Connect_Backend.Data;
+using Connect_Backend.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,12 @@ namespace Connect_Backend.Controllers
     public class TherepuetController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public TherepuetController(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public TherepuetController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
+
         }
         [HttpGet("qualifications/{qualificationId}/therepuets")]
         public async Task<IActionResult> GetAll(int qualificationId)
@@ -21,10 +25,12 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No therepuet table was found.");
             }
-            var therepuets = await _context.TherepuetsQualifications
+            List<TherepuetDto> therepuets = await _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
+                                                        .Include( t => t.Therepuet.User)
                                                         .Select(x => x.Therepuet)
+                                                        .Select(t => _mapper.Map<TherepuetDto>(t))
                                                         .ToListAsync();
             if (therepuets.Count() < 1)
             {
@@ -39,11 +45,13 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No therepuet table was found.");
             }
-            var therepuet = await _context.TherepuetsQualifications
+            TherepuetDto? therepuet = await _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
+                                                        .Include(x => x.Therepuet.User)
                                                         .Select(x => x.Therepuet)
                                                         .Where(x => x.UserId == therepuetId)
+                                                        .Select(t => _mapper.Map<TherepuetDto>(t))
                                                         .FirstOrDefaultAsync();
             if (therepuet == default)
             {

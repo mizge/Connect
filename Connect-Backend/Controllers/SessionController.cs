@@ -1,7 +1,8 @@
-﻿using Connect_Backend.Data;
+﻿using AutoMapper;
+using Connect_Backend.Data;
+using Connect_Backend.Dtos;
 using Connect_Backend.Models;
 using Connect_Backend.Requests;
-using Connect_Backend.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,12 @@ namespace Connect_Backend.Controllers
     public class SessionController : Controller
     {
         private readonly ApplicationDbContext _context;
-        public SessionController(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+
+        public SessionController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet("qualifications/{qualificationId}/therepuets/{therepuetId}/sessions")]
         public async Task<IActionResult> GetAllByQualification(int qualificationId, int therepuetId)
@@ -25,7 +29,7 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            var therepuet = await _context.TherepuetsQualifications
+            Therepuet? therepuet = await _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
                                                         .Select(x => x.Therepuet)
@@ -35,8 +39,8 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session for this therepuet is available.");
             }
-            var availableSessions = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
-                                                        .Select(s => new SessionResponse(s))
+            List<SessionDto> availableSessions = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
+                                                        .Select(s => _mapper.Map<SessionDto>(s))
                                                         .ToListAsync();
             if (availableSessions.Count() < 1)
             {
@@ -52,7 +56,7 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            var therepuet = await _context.TherepuetsQualifications
+            Therepuet? therepuet = await _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
                                                         .Select(x => x.Therepuet)
@@ -62,8 +66,8 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session for this therepuet is available.");
             }
-            var session = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
-                                                        .Select(s => new SessionResponse(s))
+            SessionDto? session = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
+                                                        .Select(s => _mapper.Map<SessionDto>(s))
                                                         .FirstOrDefaultAsync();
             if (session == default)
             {
@@ -82,12 +86,24 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            List<Session> sessions = await _context.Sessions.Where(x => x.TherepuetId == userId || x.ClientId == userId).ToListAsync();
+            List<Session> sessions = await _context.Sessions
+                .Include(s => s.Therepuet)
+                .Include(s => s.Therepuet.User)
+                .Include(s => s.Client)
+                .Where(x => x.TherepuetId == userId || x.ClientId == userId)
+                .ToListAsync();
             if (sessions.Count() < 1)
             {
                 return NotFound("No session for this user was found.");
             }
-            return Ok(sessions);
+            string role = User.Claims.ToList()[1].Value;
+            if(role == "Client")
+            {
+                List<ClientSessionDto> clientSessions = sessions.Select(s => _mapper.Map<ClientSessionDto>(s)).ToList();
+                return Ok(clientSessions);
+            }
+            List<TherepuetSessionDto> therepuetSessions = sessions.Select(s => _mapper.Map<TherepuetSessionDto>(s)).ToList();
+            return Ok(therepuetSessions);
         }
         //Get therepuets/clients sessions
         // users/{userId}/sessions/{sessionId}
@@ -100,16 +116,26 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            var session = await _context.Sessions.Where(x => x.Id == sessionId && (x.TherepuetId == userId || x.ClientId == userId)).FirstOrDefaultAsync();
+            Session? session = await _context.Sessions
+                .Include(s => s.Therepuet)
+                .Include(s => s.Therepuet.User)
+                .Include(s => s.Client)
+                .Where(x => x.Id == sessionId && (x.TherepuetId == userId || x.ClientId == userId))
+                .FirstOrDefaultAsync();
             if (session == default)
             {
                 return NotFound("No such session was found.");
             }
-            return Ok(session);
+            string role = User.Claims.ToList()[1].Value;
+            if (role == "Client")
+            {
+                return Ok(_mapper.Map<ClientSessionDto>(session));
+            }
+            return Ok(_mapper.Map<TherepuetSessionDto>(session));
         }
         [HttpPost("sessions")]
         [Authorize(Roles = "Therepuet")]
-        public ActionResult CreateSession(Session sessionRequest)
+        public async Task<IActionResult> CreateSession(CreateSessionDto sessionRequest)
         {
             if (_context.Sessions == null)
             {
@@ -125,19 +151,17 @@ namespace Connect_Backend.Controllers
             }
             Session session = new Session()
             {
-                Id = GetNewSessionId(),
                 StartTime = sessionRequest.StartTime,
                 DurationInMinutes = sessionRequest.DurationInMinutes,
-                TherepuetId = userId,
-                Therepuet = _context.Therepuets.First(x => x.UserId == userId)
+                TherepuetId = userId
             };
             _context.Sessions.Add(session);
-            _context.SaveChanges();
-            return Ok("Session created.");
+            await _context.SaveChangesAsync();
+            return Created("", _mapper.Map<SessionDto>(session));
         }
         [HttpDelete("sessions/{id}")]
         [Authorize(Roles = "Therepuet")]
-        public ActionResult DeleteSession(int id)
+        public async Task<IActionResult> DeleteSession(int id)
         {
             if (_context.Sessions == null)
             {
@@ -152,15 +176,15 @@ namespace Connect_Backend.Controllers
             if (sessionCanBeDeleted)
             {
                 _context.Sessions.Remove(_context.Sessions.Where(s => s.Id == id).First());
-                _context.SaveChanges();
-                return Ok("Session deleted.");
+                await _context.SaveChangesAsync();
+                return NoContent();
             }
 
             return BadRequest("Session cannot be deleted.");
         }
         [HttpPatch("sessions/{id}/note")]
         [Authorize(Roles = "Therepuet")]
-        public ActionResult UpdateSessionNote(int id, [FromBody] NotesRequest notes)
+        public async Task<IActionResult> UpdateSessionNote(int id, [FromBody] NoteDto notes)
         {
             if (_context.Sessions == null)
             {
@@ -177,7 +201,7 @@ namespace Connect_Backend.Controllers
                 Session session = _context.Sessions.Where(s => s.Id == id).First();
                 session.Notes = notes.Notes;
                 _context.Sessions.Update(session);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok("Session notes have been updated.");
             }
 
@@ -185,7 +209,7 @@ namespace Connect_Backend.Controllers
         }
         [HttpPatch("sessions/{id}/reservation")]
         [Authorize(Roles = "Client")]
-        public ActionResult UpdateSessionReservation(int id, [FromBody] ReservationRequest reservation)
+        public async Task<IActionResult> UpdateSessionReservation(int id, [FromBody] ReservationDto reservation)
         {
             if (_context.Sessions == null)
             {
@@ -197,12 +221,12 @@ namespace Connect_Backend.Controllers
             }
             if (reservation.IsReservation)
             {
-                return CreateSessionReservation(id);
+                return await CreateSessionReservation(id);
             }
-            return DeleteSessionReservation(id);
+            return await DeleteSessionReservation(id);
         }
 
-        private ActionResult CreateSessionReservation(int id)
+        private async Task<IActionResult> CreateSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
             bool sessionCanBeReserved = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId == null && Is24HoursTillSession(s.StartTime)).Any();
@@ -211,13 +235,13 @@ namespace Connect_Backend.Controllers
                 Session session = _context.Sessions.Where(s => s.Id == id).First();
                 session.ClientId = userId;
                 _context.Sessions.Update(session);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok("Session have been reserved.");
             }
 
             return BadRequest("Sessions cannot be reserved.");
         }
-        private ActionResult DeleteSessionReservation(int id)
+        private async Task<IActionResult> DeleteSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
             Session? session = _context.Sessions.ToList().FirstOrDefault(s => s.Id == id && s.ClientId == userId && Is24HoursTillSession(s.StartTime));
@@ -225,7 +249,7 @@ namespace Connect_Backend.Controllers
             {
                 session.ClientId = null;
                 _context.Sessions.Update(session);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok("Session have been canceled.");
             }
 
@@ -242,18 +266,6 @@ namespace Connect_Backend.Controllers
             DateTime newEnd = newStart + TimeSpan.FromMinutes(newDuration);
             DateTime oldEnd = oldStart + TimeSpan.FromMinutes(oldDuration);
             return (newStart < oldStart && newEnd < oldStart) || (newStart > oldEnd && newEnd > oldEnd);
-        }
-        private int GetNewSessionId()
-        {
-            Session lastUser = _context.Sessions.OrderBy(u => u.Id).LastOrDefault()!;
-            if (lastUser == default)
-            {
-                return 1;
-            }
-            else
-            {
-                return lastUser.Id + 1;
-            }
         }
         private bool SessionExists(int id)
         {

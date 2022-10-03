@@ -5,14 +5,15 @@ namespace Connect_Backend.Models
 {
     public class Session
     {
-        public int Id { get; set; } = -1;
+        public int Id { get; set; }
         public DateTime StartTime { get; set; }
         public int DurationInMinutes { get; set; }
         public string? Notes { get; set; }
-        public int TherepuetId { get; set; } = -1;
+        public int TherepuetId { get; set; }
         public int? ClientId { get; set; }
-        // Ask someone could i make it not nullabel 
-        public Therepuet? Therepuet { get; set; }
+        [JsonIgnore]
+        public Therepuet Therepuet { get; set; }
+        [JsonIgnore]
         public User? Client { get; set; }
 
         public bool SessionHasEnded()

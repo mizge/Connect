@@ -1,6 +1,6 @@
-﻿namespace Connect_Backend.Requests
+﻿namespace Connect_Backend.Dtos
 {
-    public class QualificationRequest
+    public class QualificationDto
     {
         public string Name { get; set; }
         public string Description { get; set; }

@@ -1,4 +1,6 @@
-﻿using Connect_Backend.Data;
+﻿using AutoMapper;
+using Connect_Backend.Data;
+using Connect_Backend.Dtos;
 using Connect_Backend.Models;
 using Connect_Backend.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +15,12 @@ namespace Connect_Backend.Controllers
     public class QualificationController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public QualificationController(ApplicationDbContext context)
+        public QualificationController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -52,7 +56,7 @@ namespace Connect_Backend.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult Create(QualificationRequest qualificationRequest)
+        public ActionResult Create(QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
             {
@@ -60,17 +64,16 @@ namespace Connect_Backend.Controllers
             }
             Qualification qualification = new Qualification()
             {
-                Id = GetNewQualificationId(),
                 Name = qualificationRequest.Name,
                 Description = qualificationRequest.Description
             };
             _context.Qualifications.Add(qualification);
             _context.SaveChanges();
-            return Ok("Qualification created.");
+            return Created("", _mapper.Map<QualificationDto>(qualification));
         }
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult Edit(int id, QualificationRequest qualificationRequest)
+        public ActionResult Edit(int id, QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
             {
@@ -110,19 +113,7 @@ namespace Connect_Backend.Controllers
             }
             _context.Qualifications.Remove(qualification);
             _context.SaveChanges();
-            return Ok("Qualification deleted.");
-        }
-        private int GetNewQualificationId()
-        {
-            Qualification lastQualification = _context.Qualifications.OrderBy(u => u.Id).LastOrDefault()!;
-            if (lastQualification == default)
-            {
-                return 1;
-            }
-            else
-            {
-                return lastQualification.Id + 1;
-            }
+            return NoContent();
         }
     }
 }
