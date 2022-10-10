@@ -1,6 +1,7 @@
 ﻿using Connect_Backend.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Connect_Backend.Data
 {
@@ -28,6 +29,7 @@ namespace Connect_Backend.Data
             builder.Entity<Therepuet>().HasMany(t => t.Sessions).WithOne(s=> s.Therepuet).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Session>().HasOne(s => s.Therepuet).WithMany(t => t.Sessions).HasForeignKey(s => s.TherepuetId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Session>().HasOne(s => s.Client).WithMany().OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Session>().Property(s => s.ClientId).IsConcurrencyToken();
             builder.Entity<TherepuetsQualifications>().HasOne(x => x.Qualification).WithMany().HasForeignKey(x=>x.QualificationId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TherepuetsQualifications>().HasOne(x => x.Therepuet).WithMany().HasForeignKey(x => x.TherepuetId).OnDelete(DeleteBehavior.NoAction);
             builder.Entity<TherepuetsQualifications>().HasKey(x => new { x.TherepuetId, x.QualificationId });

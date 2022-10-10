@@ -232,10 +232,14 @@ namespace Connect_Backend.Controllers
             bool sessionCanBeReserved = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId == null && Is24HoursTillSession(s.StartTime)).Any();
             if (sessionCanBeReserved)
             {
-                Session session = _context.Sessions.Where(s => s.Id == id).First();
+                Session session = await _context.Sessions.Where(s => s.Id == id).FirstAsync();
                 session.ClientId = userId;
                 _context.Sessions.Update(session);
-                await _context.SaveChangesAsync();
+                int responsew = await _context.SaveChangesAsync();
+                if(responsew == 0)
+                {
+                    return BadRequest("This session is no longer available");
+                }
                 return Ok("Session have been reserved.");
             }
 
@@ -244,7 +248,7 @@ namespace Connect_Backend.Controllers
         private async Task<IActionResult> DeleteSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
-            Session? session = _context.Sessions.ToList().FirstOrDefault(s => s.Id == id && s.ClientId == userId && Is24HoursTillSession(s.StartTime));
+            Session? session =   _context.Sessions.ToList().FirstOrDefault(s => s.Id == id && s.ClientId == userId && Is24HoursTillSession(s.StartTime));
             if (session != null)
             {
                 session.ClientId = null;

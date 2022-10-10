@@ -1,9 +1,11 @@
-﻿using Azure.Core;
+﻿using AutoMapper;
 using Connect_Backend.Authorization;
 using Connect_Backend.Data;
+using Connect_Backend.Dtos;
 using Connect_Backend.Models;
 using Connect_Backend.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Connect_Backend.Controllers
 {
@@ -13,23 +15,24 @@ namespace Connect_Backend.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IJwtUtils _jwtUtils;
-        public UserController(ApplicationDbContext context, IJwtUtils jwtUtils)
+        private readonly IMapper _mapper;
+        public UserController(ApplicationDbContext context, IJwtUtils jwtUtils, IMapper mapper)
         {
             _context = context;
             _jwtUtils = jwtUtils;
+            _mapper = mapper;
         }
         [HttpPost("client")]
-        public ActionResult RegisterClient(ClientRegisterRequest request)
+        public async Task<IActionResult> RegisterClient(ClientRegisterRequest request)
         {
             if (EmailExists(request.Email))
             {
                 return BadRequest("Email already exists.");
             }
-            int Id = GetNewUserId();
+
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User()
             {
-                Id = Id,
                 Email = request.Email,
                 Name = request.Name,
                 Surname = request.Surname,
@@ -37,22 +40,22 @@ namespace Connect_Backend.Controllers
                 RoleId = request.RoleId,
                 Role = _context.Roles.First(x => x.Id == request.RoleId)
             };
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            return Ok($"User created.");
+
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            return Created("", _mapper.Map<CreatedUserDto>(user));
         }
         [HttpPost("therepuet")]
-        public ActionResult RegisterTherepuet(TherepuetRegisterRequest request)
+        public async Task<IActionResult> RegisterTherepuet(TherepuetRegisterRequest request)
         {
             if (EmailExists(request.Email))
             {
                 return BadRequest("Email already exists.");
             }
-            int Id = GetNewUserId();
+
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
             User user = new User()
             {
-                Id = Id,
                 Email = request.Email,
                 Name = request.Name,
                 Surname = request.Surname,
@@ -60,34 +63,40 @@ namespace Connect_Backend.Controllers
                 RoleId = request.RoleId,
                 Role = _context.Roles.First(x => x.Id == request.RoleId)
             };
+
             _context.Users.Add(user);
             Therepuet therepuet = new Therepuet()
             {
                 UserId = user.Id,
                 User = user
             };
-            _context.Therepuets.Add(therepuet);
-            List<TherepuetsQualifications> therepuetsQualifications = request.Qualifications.Select(q => new TherepuetsQualifications(q, Id)).ToList();
-            _context.TherepuetsQualifications.AddRange(therepuetsQualifications);
-            _context.SaveChanges();
-            return Ok($"User created.");
+
+            await _context.Therepuets.AddAsync(therepuet);
+            await _context.SaveChangesAsync();
+            List<TherepuetsQualifications> therepuetsQualifications = request.Qualifications.Select(q => new TherepuetsQualifications(q, user.Id)).ToList();
+            await _context.TherepuetsQualifications.AddRangeAsync(therepuetsQualifications);
+            await _context.SaveChangesAsync();
+            return Created("", _mapper.Map<CreatedUserDto>(user));
         }
         [HttpPost]
-        public ActionResult Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest request)
         {
             if(!EmailExists(request.Email))
             {
                 return BadRequest("Incorrect credentials.");
             }
-            User user = _context.Users.First(x => x.Email == request.Email);
+
+            User user = await _context.Users.FirstAsync(x => x.Email == request.Email);
+
             if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password.Trim()))
             {
                 return BadRequest("Incorrect credentials.");
             }
-            user.Role = _context.Roles.Where(x => x.Id == user.RoleId).First();
+
+            user.Role = await _context.Roles.Where(x => x.Id == user.RoleId).FirstAsync();
             string jwtToken = _jwtUtils.GenerateToken(user);
-            int? val = _jwtUtils.ValidateToken(jwtToken);
-            return Ok($"{jwtToken}");
+
+            return Created("", $"{jwtToken}");
         }
 
         private bool EmailExists(string email)
@@ -98,18 +107,6 @@ namespace Connect_Backend.Controllers
                 return true;
             }
             return false;
-        }
-        private int GetNewUserId()
-        {
-            User lastUser = _context.Users.OrderBy(u => u.Id).LastOrDefault();
-            if (lastUser == default)
-            {
-                return 1;
-            }
-            else
-            {
-                return lastUser.Id + 1;
-            }
         }
     }
 }

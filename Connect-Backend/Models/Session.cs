@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Connect_Backend.Models
 {
@@ -10,6 +10,7 @@ namespace Connect_Backend.Models
         public int DurationInMinutes { get; set; }
         public string? Notes { get; set; }
         public int TherepuetId { get; set; }
+        [ConcurrencyCheck]
         public int? ClientId { get; set; }
         [JsonIgnore]
         public Therepuet Therepuet { get; set; }
