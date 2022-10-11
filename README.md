@@ -65,26 +65,779 @@ _2.1 pav. Sistemos Connect diegimo diagrama_
 # API specifikacija
 Tam, kad būtų išlaikomas nuoseklumas, sistemos API metodai bus aprašomi remiantis Twitter API užklausų aprašymais. Aprašymuose pateikiama svarbiausia bei būtina informacija sėkmingam užklausos vykdymui. Taip pat pateikiama informacija apie galimas klaidas, kurios gali iškilti apdorojant tam tikrą API užklausą. Verta paminėti, kad kelias iki metodo yra nurodomas tik parašant URL galutinę dalį, nes domenas gali skirtis.
 
-## Example API: _/2/users/:id/bookmarks/:tweet_id_
+# Therepuets
+## GET _/qualifications/:qualification_id/therepuets_
 
-Simple description
+Grąžina terapuetų sąrašą pagal nurodytą kvalifikaciją.
 
-**Endpoint URL**
 
-`https://api.twitter.com/2/users/:id/bookmarks/:tweet_id`
+**Nuorodos URL**
 
-**Authorization required**
+`https://localhost:7037/api/qualifications/:qualification_id/therepuets`
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
+
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kuriai ieškomi terapeutai, numeris|
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra:
+```
+[
+	{
+		"user": {
+			"id": 1,
+			"name": "Johnathan",
+			"surname": "Smithson"
+		}
+	},
+	{
+		"user": {
+			"id": 2,
+			"name": "Bellatrix",
+			"surname": "Lestrange"
+		}
+	}
+]
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, terapeutas nebuvo rastas|
+
+
+## GET _/qualifications/:qualification_id/therepuets/:therepuet_id_
+
+Grąžina pasirinktą terapuetą pagal nurodytą kvalifikaciją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications/:qualification_id/therepuets`
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
+
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kuriai ieškomi terapeutai, numeris|
+|`therepuet_id` | int| Ieškomo terapueto numeris|
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra:
+```
+{
+	"user": {
+		"id": 1,
+		"name": "John",
+		"surname": "Smith"
+	}
+}
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, terapeutas nebuvo rastas|
+
+# Homeworks
+## GET _/sessions/:session_id/homeworks_
+
+Grąžina namų darbų sąrašą pasirinktai sesijai.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/homeworks`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
 ||
 |:--:|
-|Admin|
-| User|
+|Terapeutas |
+|Klientas |
 
-**Path parameters**
-|Name| Type| Description|
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
 |:--:|:--:|:--:|
-|`id` | int||
-| User|int ||
+|`session_id` | int| Sesijos, kuriai ieškomi namų darbai, numeris|
 
-**Example responses**
 
-**Response fields**
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra:
+```
+[
+	{
+		"id": 1,
+		"task": "This is homework for client.",
+		"time": "2022-09-29T17:32:51.867",
+		"sessionId": 1
+	}
+]
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, namų darbai nebuvo rasti|
+|401| Jei vartotojas nėra autorizuotas|
+
+## GET _/sessions/:session_id/homeworks/:homework_id_
+
+Grąžina namų darbus pasirinktai sesijai.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/homeworks/:homework_id`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+|Klientas |
+
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kuriai ieškomi namų darbai, numeris|
+|`homework_id` | int| Namų darbų numeris|
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra:
+```
+{
+	"id": 1,
+	"task": "This is homework for client.",
+	"time": "2022-09-29T17:32:51.867",
+	"sessionId": 1
+}
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, namų darbai nebuvo rasti|
+|401| Jei vartotojas nėra autorizuotas|
+
+## POST _/sessions/:session_id/homeworks_
+
+Sukuria namų darbus pasirinktai sesijai.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/homeworks`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kuriai kuriami namų darbai, numeris|
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|400| Jei pagal pateiktu paieškos kriterijus, jokia sesija nebuvo rasta|
+|401| Jei vartotojas nėra autorizuotas|
+
+## PUT _/sessions/:session_id/homeworks/:homework_id_
+
+Redaguoja namų darbą pasirinktai sesijai.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/homeworks/:homework_id`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kuriai kuriami namų darbai, numeris|
+|`homework_id` | int| Namų darbų numeris|
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 201.
+
+Sėkmingo rezultato struktūra:
+```
+{
+	"id": 1,
+	"task": "This is homework for client.",
+	"time": "2022-09-29T17:32:51.867Z",
+	"sessionId": 1
+}
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, norimi redaguoti namų darbai nebuvo rasti|
+|401| Jei vartotojas nėra autorizuotas|
+
+## DELETE _/sessions/:session_id/homeworks/:homework_id_
+
+Ištrina namų darbą pasirinktai sesijai.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/homeworks/:homework_id`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kuriai kuriami namų darbai, numeris|
+|`homework_id` | int| Namų darbų numeris|
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 204.
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, norimi ištrinti namų darbai nebuvo rasti|
+|401| Jei vartotojas nėra autorizuotas|
+
+# Sessions
+## GET _qualifications/:qualification_id/therepuets/:therepuet_id/sessions_
+
+Grąžina sesijų sąrašą, pasirinktos kvalifikacijos terapeuto.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications/:qualification_id/therepuets/:therepuet_id/sessions`
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kurios terapeuto sesijos ieškomos, numeris|
+|`therepuet_id` | int| Terapeuto, kurio sesijos ieškomos, numeris|
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra:
+```
+[
+	{
+		"id": 2,
+		"startTime": "2022-11-01T10:50:46.493",
+		"durationInMinutes": 45,
+		"therepuetId": 3
+	}
+]
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, namų darbai nebuvo rasti|
+
+## GET _qualifications/:qualification_id/therepuets/:therepuet_id/sessions/:session_id_
+
+Grąžina sesiją, pasirinktos kvalifikacijos terapeuto.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications/:qualification_id/therepuets/:therepuet_id/sessions/:session_id`
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kurios terapeuto sesijos ieškomos, numeris|
+|`therepuet_id` | int| Terapeuto, kurio sesijos ieškomos, numeris|
+|`session_id` | int| Ieškomos sesijos numeris|
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra:
+```
+{
+	"id": 2,
+	"startTime": "2022-11-01T10:50:46.493",
+	"durationInMinutes": 45,
+	"therepuetId": 3
+}
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, sesijos nebuvo rastos|
+
+## GET _/sessions_
+
+Grąžina sesijų sąrašą, priklausantį registruotam sistemos vartotojui.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+|Klientas |
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra, jei vartotojas yra klientas:
+```
+[
+	{
+		"id": 1,
+		"startTime": "2022-10-01T10:50:46.493",
+		"durationInMinutes": 45,
+		"therepuet": {
+			"user": {
+				"id": 3,
+				"name": "John",
+				"surname": "Smith"
+			}
+		}
+	}
+]
+```
+Sėkmingo rezultato struktūra, jei vartotojas yra terapeutas:
+```
+[
+	{
+		"id": 1,
+		"startTime": "2022-10-01T10:50:46.493",
+		"durationInMinutes": 45,
+		"client": {
+			"id": 2,
+			"name": "Jane",
+			"surname": "Doe"
+		}
+	},
+	{
+		"id": 2,
+		"startTime": "2022-11-01T10:50:46.493",
+		"durationInMinutes": 45,
+		"client": null
+	}
+]
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, sesijos nebuvo rastos|
+|401| Jei vartotojas nėra autorizuotas|
+
+
+## GET _/sessions/:session_id_
+
+Grąžina sesiją, priklausančią registruotam sistemos vartotojui.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id`
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Ieškomos sesijos numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+|Klientas |
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+Sėkmingo rezultato struktūra, jei vartotojas yra klientas:
+```
+{
+	"id": 1,
+	"startTime": "2022-10-01T10:50:46.493",
+	"durationInMinutes": 45,
+	"therepuet": {
+		"user": {
+			"id": 3,
+			"name": "John",
+			"surname": "Smith"
+		}
+	}
+}
+```
+Sėkmingo rezultato struktūra, jei vartotojas yra terapeutas:
+```
+{
+	"id": 1,
+	"startTime": "2022-10-01T10:50:46.493",
+	"durationInMinutes": 45,
+	"client": {
+		"id": 2,
+		"name": "Jane",
+		"surname": "Doe"
+	}
+}
+```
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Jei pagal pateiktu paieškos kriterijus, sesijos nebuvo rastos|
+|401| Jei vartotojas nėra autorizuotas|
+
+## POST _/sessions_
+
+Sukuria naują sesiją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 201.
+
+Sėkmingo rezultato struktūra:
+```
+{
+	"id": 1,
+	"startTime": "2022-11-02T10:50:46.494Z",
+	"durationInMinutes": 45,
+	"therepuetId": 3
+}
+```
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|400| Jei nurodyti neteisingi parametrai sesijai sukurti|
+|401| Jei vartotojas nėra autorizuotas|
+
+## PATCH _/sessions/:session_id/note_
+
+Redaguoja pasirinktos sesijos užrašus.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/note`
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kuriai norima redaguoti užrašus, numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Terapeutas |
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+Sėkmingo rezultato struktūra:
+```
+{
+	"id": 1,
+	"startTime": "2022-11-02T10:50:46.494Z",
+	"durationInMinutes": 45,
+	"therepuetId": 3
+}
+```
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|400| Jei nurodytos sesijos užrašai, dar negalimi redaguoti|
+|404| Jei nurodyta sesija nebuvo rasta|
+|401| Jei vartotojas nėra autorizuotas|
+
+## PATCH _/sessions/:session_id/reservation_
+
+Rezervuoti arba atšaukti pasirinktą sesiją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/sessions/:session_id/reservation`
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kurios užimtumą norima keisti, numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Klientas |
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|400| Jei sesijos užrezervuoti nėra galima |
+|404| Jei nurodyta sesija nebuvo rasta|
+|401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojas neturi tinkamos rolės|
+
+## GET _/qualifications_
+
+Grąžina visų kvalifikacijų sąrašą.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications`
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+Sėkmingo rezultato struktūra:
+```
+[
+	{
+		"id": 1,
+		"name": "Simple qualification",
+		"description": "Description for simple qualification."
+	},
+	{
+		"id": 2,
+		"name": "Advanced qualification",
+		"description": "Description for advanced qualification."
+	},
+	{
+		"id": 3,
+		"name": "Supreme type qualification",
+		"description": "Description for supreme type qualification."
+	}
+]
+```
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Kvalifikacijos nebuvo rastos|
+
+## GET _/qualifications/:qualification_id_
+
+Grąžina pasirinktą kvalifikaciją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications/:qualification_id`
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kurią norima gauti, numeris|
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+Sėkmingo rezultato struktūra:
+```
+{
+	"id": 1,
+	"name": "Simple qualification",
+	"description": "Description for simple qualification."
+}
+```
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Kvalifikacija nebuvo rasta|
+
+## POST _/qualifications_
+
+Sukuria naują kvalifikaciją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications`
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Administratorius |
+
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 201.
+Sėkmingo rezultato struktūra:
+```
+{
+	"name": "Supreme type qualification",
+	"description": "Description for supreme type qualification."
+}
+```
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|401| Vartotojas nėra autorizuotas|
+
+## PUT _/qualifications/:qualification_id_
+
+Redaguoja pasirinktą kvalifikaciją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications/:qualification_id`
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kurią norima redaguoti, numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Administratorius |
+
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 200.
+
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Kvalifikacija nebuvo rasta|
+|401| Vartotojas nėra autorizuotas|
+
+## DELETE _/qualifications/:qualification_id_
+
+Ištrina pasirinktą kvalifikaciją.
+
+
+**Nuorodos URL**
+
+`https://localhost:7037/api/qualifications/:qualification_id`
+
+**Nuorodos parametrai**
+
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`qualification_id` | int| Kvalifikacijos, kurią norima ištrinti, numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+||
+|:--:|
+|Administratorius |
+
+
+
+**Rezultatų pavyzdžiai**
+
+Sėkmingo rezultato kodas: 204.
+
+
+|Galimi klaidų kodai|Sąlyga|
+|:--:|:--:|
+|404| Kvalifikacija nebuvo rasta|
+|403| Kvalifikacijos ištrinti negalima|
+|401| Vartotojas nėra autorizuotas|
