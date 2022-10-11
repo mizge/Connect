@@ -3,7 +3,6 @@ using Connect_Backend.Authorization;
 using Connect_Backend.Data;
 using Connect_Backend.Dtos;
 using Connect_Backend.Models;
-using Connect_Backend.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -79,7 +78,7 @@ namespace Connect_Backend.Controllers
             return Created("", _mapper.Map<CreatedUserDto>(user));
         }
         [HttpPost]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginDto request)
         {
             if(!EmailExists(request.Email))
             {
