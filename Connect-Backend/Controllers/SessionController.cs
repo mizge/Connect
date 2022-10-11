@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Connect_Backend.Data;
 using Connect_Backend.Dtos;
+using Connect_Backend.Helpers;
 using Connect_Backend.Models;
 using Connect_Backend.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -39,13 +40,14 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session for this therepuet is available.");
             }
-            List<SessionDto> availableSessions = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
-                                                        .Select(s => _mapper.Map<SessionDto>(s))
-                                                        .ToListAsync();
+            var availableSessions =  _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
+                                                                                .Select(s => _mapper.Map<SessionDto>(s))
+                                                                                .AsQueryable();
             if (availableSessions.Count() < 1)
             {
                 return NotFound("No session for this therepuet is available.");
             }
+
             return Ok(availableSessions);
         }
 

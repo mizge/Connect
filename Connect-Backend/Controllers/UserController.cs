@@ -23,7 +23,7 @@ namespace Connect_Backend.Controllers
             _mapper = mapper;
         }
         [HttpPost("client")]
-        public async Task<IActionResult> RegisterClient(ClientRegisterRequest request)
+        public async Task<IActionResult> RegisterClient(CreateClientDto request)
         {
             if (EmailExists(request.Email))
             {
@@ -46,7 +46,7 @@ namespace Connect_Backend.Controllers
             return Created("", _mapper.Map<CreatedUserDto>(user));
         }
         [HttpPost("therepuet")]
-        public async Task<IActionResult> RegisterTherepuet(TherepuetRegisterRequest request)
+        public async Task<IActionResult> RegisterTherepuet(CreateTherepuetDto request)
         {
             if (EmailExists(request.Email))
             {

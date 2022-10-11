@@ -1,6 +1,6 @@
-﻿namespace Connect_Backend.Requests
+﻿namespace Connect_Backend.Dtos
 {
-    public class ClientRegisterRequest
+    public class CreateClientDto
     {
         public string Email { get; set; }
         public string Name { get; set; }

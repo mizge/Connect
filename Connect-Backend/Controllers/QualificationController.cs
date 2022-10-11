@@ -2,10 +2,8 @@
 using Connect_Backend.Data;
 using Connect_Backend.Dtos;
 using Connect_Backend.Models;
-using Connect_Backend.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.Entity;
 
 
 namespace Connect_Backend.Controllers

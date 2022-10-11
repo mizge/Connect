@@ -1,8 +1,6 @@
-﻿using Connect_Backend.Models;
-
-namespace Connect_Backend.Requests
+﻿namespace Connect_Backend.Dtos
 {
-    public class TherepuetRegisterRequest
+    public class CreateTherepuetDto
     {
         public string Email { get; set; }
         public string Name { get; set; }
