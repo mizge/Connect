@@ -11,11 +11,11 @@ Projekto tikslas – palengvinti terapeuto ir kliento interakciją, sukuriant ce
 
 Veikimo principas – pačią kuriamą platformą sudaro dvi dalys: internetinė aplikacija, kuria naudosis klientas ir terapeutas bei aplikacijų programavimo sąsaja (angl. trump. API).
 
-Terapeutas, norėdamas naudotis šia platforma, užsiregistruoja sistemoje pasirinkdamas savo specializacijos kryptį ar kryptis. Terapuetas gali kurti seansus. Kai pirmasis seansas, terapuetas gali palikti užrašus apie įvykusį seansą bei priskirti namų darbus užduotus po seanso. Terapeutas taip pat gali ištrinti neužrezervuotus seansus ar pridėti naujų. Terapeutas turi galimybę peržiūrėti jau įvykusių ir įvyksiančių seansus. Klientas gali matyti savo seansų istoriją, namų darbus bei atšaukti dar neprasidėjusius seansus. Užsiregistruoti į seansą gali tik klientas.
+Terapeutas, norėdamas naudotis šia platforma, užsiregistruoja sistemoje pasirinkdamas savo specializacijos kryptį ar kryptis. Terapuetas gali kurti seansus. Kai seansas baigiasi, terapuetas gali palikti užrašus apie įvykusį seansą bei priskirti namų darbus, užduotus po seanso. Terapeutas taip pat gali ištrinti neužrezervuotus seansus. Terapeutas turi galimybę peržiūrėti jau įvykusius ir įvyksiančius seansus. Klientas taip pat gali matyti savo seansų istoriją, namų darbus bei atšaukti dar neprasidėjusius seansus. Užsiregistruoti į seansą gali tik klientas.
 
 Sistemos administratorius gali kurti terapuetų kvalifikacijas.
 
-Neprisregistravęs vartotojas gali pasirinkęs jam norimą terapeutų specializacijos kategoriją, peržiūrėti pasirinkto terapeuto laisvus seansus. 
+Neprisregistravęs vartotojas gali pasirinkęs jam norimą terapeutų specializacijos kategoriją, peržiūrėti pasirinkto terapeuto laisvus seansus. Taip pat peržiūrėti visas kvalifikacijas nesurišant jų su terapeutais.
 
 ## Funkciniai reikalavimai
 
@@ -56,7 +56,7 @@ Sistemos sudedamosios dalys:
 *	Kliento pusė (ang. Front-End) – naudojant React.js; 
 *	Serverio pusė (angl. Back-End) – naudojant C# .NET. Duomenų bazė – MySQL. 
 
-2.1 pav. pavaizduota kuriamos sistemos diegimo diagrama. Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra diegiama tame pačiame serveryje. Internetinė aplikacija yra pasiekiama per HTTPS protokolą. Šios sistemos veikimui (pvz., duomenų manipuliavimui su duomenų baze) yra reikalingas Connect API, kuris pasiekiamas per aplikacijų programavimo sąsają. Pats Connect API vykdo duomenų mainus su duomenų baze - tam naudojamas TCP komunikacijos protokolas.
+2.1 pav. pavaizduota kuriamos sistemos diegimo diagrama. Sistemos talpinimui yra naudojamas Azure serveris. Kiekviena sistemos dalis yra diegiama tame pačiame serveryje. Internetinė aplikacija yra pasiekiama per HTTPS protokolą. Šios sistemos veikimui (pvz., duomenų manipuliavimui su duomenų baze) yra reikalingas IIS, kuris pasiekiamas per aplikacijų programavimo sąsają. Pats IIS vykdo duomenų mainus su duomenų baze - tam naudojamas TCP komunikacijos protokolas.
 
 ![](Picture1.png)
 
@@ -75,15 +75,15 @@ Grąžina terapuetų sąrašą pagal nurodytą kvalifikaciją.
 
 `https://localhost:7037/api/qualifications/:qualification_id/therepuets`
 
-**Reikalinga autorizacija**
-
-Šiai užklausai autorizacija nereikalinga.
-
-
 **Nuorodos parametrai**
 |Vardas| Tipas| Aprašymas|
 |:--:|:--:|:--:|
 |`qualification_id` | int| Kvalifikacijos, kuriai ieškomi terapeutai, numeris|
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
 
 
 **Rezultatų pavyzdžiai**
@@ -109,6 +109,7 @@ Sėkmingo rezultato struktūra:
 	}
 ]
 ```
+
 |Galimi klaidų kodai|Sąlyga|
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, terapeutas nebuvo rastas|
@@ -121,18 +122,18 @@ Grąžina pasirinktą terapuetą pagal nurodytą kvalifikaciją.
 
 **Nuorodos URL**
 
-`https://localhost:7037/api/qualifications/:qualification_id/therepuets`
-
-**Reikalinga autorizacija**
-
-Šiai užklausai autorizacija nereikalinga.
-
+`https://localhost:7037/api/qualifications/:qualification_id/therepuets/:therepuet_id`
 
 **Nuorodos parametrai**
 |Vardas| Tipas| Aprašymas|
 |:--:|:--:|:--:|
 |`qualification_id` | int| Kvalifikacijos, kuriai ieškomi terapeutai, numeris|
 |`therepuet_id` | int| Ieškomo terapueto numeris|
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
 
 
 **Rezultatų pavyzdžiai**
@@ -163,20 +164,19 @@ Grąžina namų darbų sąrašą pasirinktai sesijai.
 
 `https://localhost:7037/api/sessions/:session_id/homeworks`
 
-**Reikalinga autorizacija**
-
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
-||
-|:--:|
-|Terapeutas |
-|Klientas |
-
 **Nuorodos parametrai**
 
 |Vardas| Tipas| Aprašymas|
 |:--:|:--:|:--:|
 |`session_id` | int| Sesijos, kuriai ieškomi namų darbai, numeris|
 
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
+||
+|:--:|
+|Terapeutas |
+|Klientas |
 
 
 **Rezultatų pavyzdžiai**
@@ -198,29 +198,32 @@ Sėkmingo rezultato struktūra:
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, namų darbai nebuvo rasti|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojo rolė netenkina reikalaujamų rolių|
 
 ## GET _/sessions/:session_id/homeworks/:homework_id_
 
-Grąžina namų darbus pasirinktai sesijai.
+Grąžina pasirinktą namų darbą pasirinktai sesijai.
 
 
 **Nuorodos URL**
 
 `https://localhost:7037/api/sessions/:session_id/homeworks/:homework_id`
 
-**Reikalinga autorizacija**
-
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
-||
-|:--:|
-|Terapeutas |
-|Klientas |
 
 **Nuorodos parametrai**
 |Vardas| Tipas| Aprašymas|
 |:--:|:--:|:--:|
 |`session_id` | int| Sesijos, kuriai ieškomi namų darbai, numeris|
-|`homework_id` | int| Namų darbų numeris|
+|`homework_id` | int| Namų darbo numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
+||
+|:--:|
+|Terapeutas |
+|Klientas |
+
 
 
 **Rezultatų pavyzdžiai**
@@ -240,53 +243,49 @@ Sėkmingo rezultato struktūra:
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, namų darbai nebuvo rasti|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojo rolė netenkina reikalaujamų rolių|
 
 ## POST _/sessions/:session_id/homeworks_
 
-Sukuria namų darbus pasirinktai sesijai.
+Sukuria namų darbą pasirinktai sesijai.
 
 
 **Nuorodos URL**
 
 `https://localhost:7037/api/sessions/:session_id/homeworks`
 
+**Nuorodos parametrai**
+|Vardas| Tipas| Aprašymas|
+|:--:|:--:|:--:|
+|`session_id` | int| Sesijos, kuriai kuriamas namų darbas, numeris|
+
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Terapeutas |
 
-**Nuorodos parametrai**
-|Vardas| Tipas| Aprašymas|
-|:--:|:--:|:--:|
-|`session_id` | int| Sesijos, kuriai kuriami namų darbai, numeris|
 
 
 **Rezultatų pavyzdžiai**
 
-Sėkmingo rezultato kodas: 200.
+Sėkmingo rezultato kodas: 201.
 
 |Galimi klaidų kodai|Sąlyga|
 |:--:|:--:|
 |400| Jei pagal pateiktu paieškos kriterijus, jokia sesija nebuvo rasta|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojo rolė netenkina reikalaujamų rolių|
 
 ## PUT _/sessions/:session_id/homeworks/:homework_id_
 
-Redaguoja namų darbą pasirinktai sesijai.
+Redaguoja pasirinktą namų darbą pasirinktai sesijai.
 
 
 **Nuorodos URL**
 
 `https://localhost:7037/api/sessions/:session_id/homeworks/:homework_id`
-
-**Reikalinga autorizacija**
-
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
-||
-|:--:|
-|Terapeutas |
 
 **Nuorodos parametrai**
 |Vardas| Tipas| Aprašymas|
@@ -294,9 +293,17 @@ Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų v
 |`session_id` | int| Sesijos, kuriai kuriami namų darbai, numeris|
 |`homework_id` | int| Namų darbų numeris|
 
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
+||
+|:--:|
+|Terapeutas |
+
+
 **Rezultatų pavyzdžiai**
 
-Sėkmingo rezultato kodas: 201.
+Sėkmingo rezultato kodas: 200.
 
 Sėkmingo rezultato struktūra:
 ```
@@ -311,28 +318,30 @@ Sėkmingo rezultato struktūra:
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, norimi redaguoti namų darbai nebuvo rasti|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojo rolė netenkina reikalaujamų rolių|
 
 ## DELETE _/sessions/:session_id/homeworks/:homework_id_
 
-Ištrina namų darbą pasirinktai sesijai.
+Ištrina pasirinktą namų darbą pasirinktai sesijai.
 
 
 **Nuorodos URL**
 
 `https://localhost:7037/api/sessions/:session_id/homeworks/:homework_id`
 
-**Reikalinga autorizacija**
-
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
-||
-|:--:|
-|Terapeutas |
-
 **Nuorodos parametrai**
 |Vardas| Tipas| Aprašymas|
 |:--:|:--:|:--:|
 |`session_id` | int| Sesijos, kuriai kuriami namų darbai, numeris|
 |`homework_id` | int| Namų darbų numeris|
+
+**Reikalinga autorizacija**
+
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
+||
+|:--:|
+|Terapeutas |
+
 
 **Rezultatų pavyzdžiai**
 
@@ -342,20 +351,18 @@ Sėkmingo rezultato kodas: 204.
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, norimi ištrinti namų darbai nebuvo rasti|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojo rolė netenkina reikalaujamų rolių|
+
 
 # Sessions
 ## GET _qualifications/:qualification_id/therepuets/:therepuet_id/sessions_
 
-Grąžina sesijų sąrašą, pasirinktos kvalifikacijos terapeuto.
+Grąžina pasirinktos kvalifikacijos pasirinkto terapeuto sesijų sąrašą.
 
 
 **Nuorodos URL**
 
 `https://localhost:7037/api/qualifications/:qualification_id/therepuets/:therepuet_id/sessions`
-
-**Reikalinga autorizacija**
-
-Šiai užklausai autorizacija nereikalinga.
 
 **Nuorodos parametrai**
 
@@ -363,6 +370,10 @@ Grąžina sesijų sąrašą, pasirinktos kvalifikacijos terapeuto.
 |:--:|:--:|:--:|
 |`qualification_id` | int| Kvalifikacijos, kurios terapeuto sesijos ieškomos, numeris|
 |`therepuet_id` | int| Terapeuto, kurio sesijos ieškomos, numeris|
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
 
 
 **Rezultatų pavyzdžiai**
@@ -386,16 +397,13 @@ Sėkmingo rezultato struktūra:
 
 ## GET _qualifications/:qualification_id/therepuets/:therepuet_id/sessions/:session_id_
 
-Grąžina sesiją, pasirinktos kvalifikacijos terapeuto.
+Grąžina pasirinktos kvalifikacijos pasirinkto terapeuto sesiją.
 
 
 **Nuorodos URL**
 
 `https://localhost:7037/api/qualifications/:qualification_id/therepuets/:therepuet_id/sessions/:session_id`
 
-**Reikalinga autorizacija**
-
-Šiai užklausai autorizacija nereikalinga.
 
 **Nuorodos parametrai**
 
@@ -404,6 +412,11 @@ Grąžina sesiją, pasirinktos kvalifikacijos terapeuto.
 |`qualification_id` | int| Kvalifikacijos, kurios terapeuto sesijos ieškomos, numeris|
 |`therepuet_id` | int| Terapeuto, kurio sesijos ieškomos, numeris|
 |`session_id` | int| Ieškomos sesijos numeris|
+
+**Reikalinga autorizacija**
+
+Šiai užklausai autorizacija nereikalinga.
+
 
 **Rezultatų pavyzdžiai**
 
@@ -422,6 +435,7 @@ Sėkmingo rezultato struktūra:
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, sesijos nebuvo rastos|
 
+
 ## GET _/sessions_
 
 Grąžina sesijų sąrašą, priklausantį registruotam sistemos vartotojui.
@@ -433,7 +447,7 @@ Grąžina sesijų sąrašą, priklausantį registruotam sistemos vartotojui.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Terapeutas |
@@ -486,7 +500,7 @@ Sėkmingo rezultato struktūra, jei vartotojas yra terapeutas:
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, sesijos nebuvo rastos|
 |401| Jei vartotojas nėra autorizuotas|
-
+|403| Jei vartotojas neturi tinkamos rolės|
 
 ## GET _/sessions/:session_id_
 
@@ -505,7 +519,7 @@ Grąžina sesiją, priklausančią registruotam sistemos vartotojui.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Terapeutas |
@@ -548,6 +562,7 @@ Sėkmingo rezultato struktūra, jei vartotojas yra terapeutas:
 |:--:|:--:|
 |404| Jei pagal pateiktu paieškos kriterijus, sesijos nebuvo rastos|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojas neturi tinkamos rolės|
 
 ## POST _/sessions_
 
@@ -560,7 +575,7 @@ Sukuria naują sesiją.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Terapeutas |
@@ -584,6 +599,7 @@ Sėkmingo rezultato struktūra:
 |:--:|:--:|
 |400| Jei nurodyti neteisingi parametrai sesijai sukurti|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojas neturi tinkamos rolės|
 
 ## PATCH _/sessions/:session_id/note_
 
@@ -602,7 +618,7 @@ Redaguoja pasirinktos sesijos užrašus.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Terapeutas |
@@ -626,10 +642,11 @@ Sėkmingo rezultato struktūra:
 |400| Jei nurodytos sesijos užrašai, dar negalimi redaguoti|
 |404| Jei nurodyta sesija nebuvo rasta|
 |401| Jei vartotojas nėra autorizuotas|
+|403| Jei vartotojas neturi tinkamos rolės|
 
 ## PATCH _/sessions/:session_id/reservation_
 
-Rezervuoti arba atšaukti pasirinktą sesiją.
+Rezervuoja arba atšaukia pasirinktą sesiją.
 
 
 **Nuorodos URL**
@@ -644,7 +661,7 @@ Rezervuoti arba atšaukti pasirinktą sesiją.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Klientas |
@@ -751,7 +768,7 @@ Sukuria naują kvalifikaciją.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Administratorius |
@@ -772,6 +789,7 @@ Sėkmingo rezultato struktūra:
 |Galimi klaidų kodai|Sąlyga|
 |:--:|:--:|
 |401| Vartotojas nėra autorizuotas|
+|403| Jei vartotojas neturi tinkamos rolės|
 
 ## PUT _/qualifications/:qualification_id_
 
@@ -790,7 +808,7 @@ Redaguoja pasirinktą kvalifikaciją.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Administratorius |
@@ -806,6 +824,7 @@ Sėkmingo rezultato kodas: 200.
 |:--:|:--:|
 |404| Kvalifikacija nebuvo rasta|
 |401| Vartotojas nėra autorizuotas|
+|403| Jei vartotojas neturi tinkamos rolės|
 
 ## DELETE _/qualifications/:qualification_id_
 
@@ -824,7 +843,7 @@ Ištrina pasirinktą kvalifikaciją.
 
 **Reikalinga autorizacija**
 
-Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų
+Sistemos vartotojas turi būti autorizuotas, kaip vienas iš žemiau nurodytų vartotojų:
 ||
 |:--:|
 |Administratorius |
@@ -839,5 +858,5 @@ Sėkmingo rezultato kodas: 204.
 |Galimi klaidų kodai|Sąlyga|
 |:--:|:--:|
 |404| Kvalifikacija nebuvo rasta|
-|403| Kvalifikacijos ištrinti negalima|
+|403| Jei vartotojas neturi tinkamos rolės|
 |401| Vartotojas nėra autorizuotas|
