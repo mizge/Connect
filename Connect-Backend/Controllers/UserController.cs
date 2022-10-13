@@ -24,7 +24,7 @@ namespace Connect_Backend.Controllers
         [HttpPost("client")]
         public async Task<IActionResult> RegisterClient(CreateClientDto request)
         {
-            if (EmailExists(request.Email))
+            if (await EmailExists(request.Email))
             {
                 return BadRequest("Email already exists.");
             }
@@ -37,7 +37,7 @@ namespace Connect_Backend.Controllers
                 Surname = request.Surname,
                 Password = passwordHash,
                 RoleId = request.RoleId,
-                Role = _context.Roles.First(x => x.Id == request.RoleId)
+                Role = await _context.Roles.FirstAsync(x => x.Id == request.RoleId)
             };
 
             await _context.Users.AddAsync(user);
@@ -47,7 +47,7 @@ namespace Connect_Backend.Controllers
         [HttpPost("therepuet")]
         public async Task<IActionResult> RegisterTherepuet(CreateTherepuetDto request)
         {
-            if (EmailExists(request.Email))
+            if (await EmailExists(request.Email))
             {
                 return BadRequest("Email already exists.");
             }
@@ -60,10 +60,10 @@ namespace Connect_Backend.Controllers
                 Surname = request.Surname,
                 Password = passwordHash,
                 RoleId = request.RoleId,
-                Role = _context.Roles.First(x => x.Id == request.RoleId)
+                Role = await _context.Roles.FirstAsync(x => x.Id == request.RoleId)
             };
 
-            _context.Users.Add(user);
+            await _context.Users.AddAsync(user);
             Therepuet therepuet = new Therepuet()
             {
                 UserId = user.Id,
@@ -72,15 +72,17 @@ namespace Connect_Backend.Controllers
 
             await _context.Therepuets.AddAsync(therepuet);
             await _context.SaveChangesAsync();
+
             List<TherepuetsQualifications> therepuetsQualifications = request.Qualifications.Select(q => new TherepuetsQualifications(q, user.Id)).ToList();
             await _context.TherepuetsQualifications.AddRangeAsync(therepuetsQualifications);
             await _context.SaveChangesAsync();
+
             return Created("", _mapper.Map<CreatedUserDto>(user));
         }
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto request)
         {
-            if(!EmailExists(request.Email))
+            if(!await EmailExists(request.Email))
             {
                 return BadRequest("Incorrect credentials.");
             }
@@ -98,9 +100,9 @@ namespace Connect_Backend.Controllers
             return Created("", $"{jwtToken}");
         }
 
-        private bool EmailExists(string email)
+        private async Task<bool> EmailExists(string email)
         {
-            string? existingEmail =  _context.Users.Select(u => u.Email).FirstOrDefault(e => e == email);
+            string? existingEmail =  await _context.Users.Select(u => u.Email).FirstOrDefaultAsync(e => e == email);
             if(existingEmail != null)
             {
                 return true;

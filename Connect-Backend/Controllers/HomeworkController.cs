@@ -80,7 +80,7 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No homework table was found.");
             }
-            if(!HomeworkCanBeCreated(sessionId, userId))
+            if(!await HomeworkCanBeCreated(sessionId, userId))
             {
                 return BadRequest("No such session exist.");
             }
@@ -138,9 +138,9 @@ namespace Connect_Backend.Controllers
             return NoContent();
         }
 
-        private bool HomeworkCanBeCreated(int sessionId, int therepuetId)
+        private async Task<bool> HomeworkCanBeCreated(int sessionId, int therepuetId)
         {
-            Session? session = _context.Sessions.Where(x => x.Id == sessionId && x.TherepuetId == therepuetId && x.ClientId != null).FirstOrDefault();
+            Session? session = await _context.Sessions.Where(x => x.Id == sessionId && x.TherepuetId == therepuetId && x.ClientId != null).FirstOrDefaultAsync();
             if(session == null)
             {
                 return false;

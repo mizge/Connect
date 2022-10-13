@@ -46,8 +46,8 @@ namespace Connect_Backend.Controllers
                 return NotFound("No therepuets in this page.");
             }
 
-            var previousPageLink = pagedTherepuets.HasPrevious ? CreateTopicsResourceUri(searchParameters, ResourceUriType.PreviousPage) : null;
-            var nextPageLink = pagedTherepuets.HasNext ?
+            string? previousPageLink = pagedTherepuets.HasPrevious ? CreateTopicsResourceUri(searchParameters, ResourceUriType.PreviousPage) : null;
+            string? nextPageLink = pagedTherepuets.HasNext ?
                 CreateTopicsResourceUri(searchParameters,
                     ResourceUriType.NextPage) : null;
 
@@ -60,6 +60,7 @@ namespace Connect_Backend.Controllers
                 previousPageLink,
                 nextPageLink
             };
+
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
             return Ok(pagedTherepuets);
         }

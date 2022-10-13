@@ -65,7 +65,7 @@ namespace Connect_Backend.Controllers
                 Name = qualificationRequest.Name,
                 Description = qualificationRequest.Description
             };
-            _context.Qualifications.Add(qualification);
+            await _context.Qualifications.AddAsync(qualification);
             await _context.SaveChangesAsync();
             return Created("", _mapper.Map<QualificationDto>(qualification));
         }
@@ -78,7 +78,7 @@ namespace Connect_Backend.Controllers
                 return NotFound("No qualification table was found.");
             }
 
-            Qualification qualification = _context.Qualifications.FirstOrDefault(q => q.Id == id)!;
+            Qualification? qualification = await _context.Qualifications.FirstOrDefaultAsync(q => q.Id == id)!;
             if (qualification == null)
             {
                 return NotFound("No qualification was found.");
@@ -99,12 +99,12 @@ namespace Connect_Backend.Controllers
                 return NotFound("No qualification table was found.");
             }
 
-            Qualification qualification =  _context.Qualifications.FirstOrDefault(m => m.Id == id)!;
+            Qualification? qualification = await _context.Qualifications.FirstOrDefaultAsync(m => m.Id == id)!;
             if (qualification == null)
             {
                 return NotFound("No qualification was found.");
             }
-            int therepuetsCount = _context.TherepuetsQualifications.Where(tq => tq.QualificationId == id).Count();
+            int therepuetsCount = await _context.TherepuetsQualifications.Where(tq => tq.QualificationId == id).CountAsync();
             if(therepuetsCount > 0)
             {
                 return BadRequest("The qualification cannot be deleted.");

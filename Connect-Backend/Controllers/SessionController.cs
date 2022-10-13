@@ -38,10 +38,10 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session for this therepuet is available.");
             }
-            var availableSessions =  _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
+            List<SessionDto> availableSessions = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
                                                                                 .Select(s => _mapper.Map<SessionDto>(s))
-                                                                                .AsQueryable();
-            if (availableSessions.Count() < 1)
+                                                                                .ToListAsync();
+            if (availableSessions.Count < 1)
             {
                 return NotFound("No session for this therepuet is available.");
             }
@@ -86,22 +86,27 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
+
             List<Session> sessions = await _context.Sessions
                 .Include(s => s.Therepuet)
                 .Include(s => s.Therepuet.User)
                 .Include(s => s.Client)
                 .Where(x => x.TherepuetId == userId || x.ClientId == userId)
                 .ToListAsync();
-            if (sessions.Count() < 1)
+
+            if (sessions.Count < 1)
             {
                 return NotFound("No session for this user was found.");
             }
+
             string role = User.Claims.ToList()[1].Value;
+
             if(role == "Client")
             {
                 List<ClientSessionDto> clientSessions = sessions.Select(s => _mapper.Map<ClientSessionDto>(s)).ToList();
                 return Ok(clientSessions);
             }
+
             List<TherepuetSessionDto> therepuetSessions = sessions.Select(s => _mapper.Map<TherepuetSessionDto>(s)).ToList();
             return Ok(therepuetSessions);
         }
@@ -126,7 +131,9 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No such session was found.");
             }
+
             string role = User.Claims.ToList()[1].Value;
+
             if (role == "Client")
             {
                 return Ok(_mapper.Map<ClientSessionDto>(session));
@@ -141,20 +148,25 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
+
             int userId = int.Parse(User.Claims.First().Value);
-            List<Session> sessionsOnThisTime = _context.Sessions.ToList().Where(s => s.TherepuetId == userId &&
-                SessionTimeOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes)).ToList();
+            List<Session> sessionsOnThisTime = await _context.Sessions.Where(s => s.TherepuetId == userId && 
+                                                                      SessionTimeOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes))
+                                                                      .ToListAsync();
+
             if ((!sessionsOnThisTime.Any() && sessionsOnThisTime.Count > 0) || sessionRequest.DurationInMinutes < 0)
             {
                 return BadRequest("Session time invalid.");
             }
-            Session session = new Session()
+
+            Session session = new()
             {
                 StartTime = sessionRequest.StartTime,
                 DurationInMinutes = sessionRequest.DurationInMinutes,
                 TherepuetId = userId
             };
-            _context.Sessions.Add(session);
+
+            await _context.Sessions.AddAsync(session);
             await _context.SaveChangesAsync();
             return Created("", _mapper.Map<SessionDto>(session));
         }
@@ -166,15 +178,18 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            if (!SessionExists(id))
+
+            if (!await SessionExists(id))
             {
                 return NotFound("No session was found.");
             }
+
             int userId = int.Parse(User.Claims.First().Value);
-            bool sessionCanBeDeleted = _context.Sessions.Where(s => s.Id == id && s.ClientId == null).Any();
+            bool sessionCanBeDeleted = await _context.Sessions.Where(s => s.Id == id && s.ClientId == null).AnyAsync();
+
             if (sessionCanBeDeleted)
             {
-                _context.Sessions.Remove(_context.Sessions.Where(s => s.Id == id).First());
+                _context.Sessions.Remove(await _context.Sessions.Where(s => s.Id == id).FirstAsync());
                 await _context.SaveChangesAsync();
                 return NoContent();
             }
@@ -189,15 +204,18 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            if (!SessionExists(id))
+
+            if (!await SessionExists(id))
             {
                 return NotFound("No session was found.");
             }
+
             int userId = int.Parse(User.Claims.First().Value);
-            bool sessionCanBeUpdated = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId != null && s.SessionHasEnded()).Any();
+            bool sessionCanBeUpdated = await _context.Sessions.Where(s => s.Id == id && s.ClientId != null && s.SessionHasEnded()).AnyAsync();
+
             if (sessionCanBeUpdated)
             {
-                Session session = _context.Sessions.Where(s => s.Id == id).First();
+                Session session = await _context.Sessions.Where(s => s.Id == id).FirstAsync();
                 session.Notes = notes.Notes;
                 _context.Sessions.Update(session);
                 await _context.SaveChangesAsync();
@@ -214,31 +232,37 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session table was found.");
             }
-            if (!SessionExists(id))
+
+            if (!await SessionExists(id))
             {
                 return NotFound("No session was found.");
             }
+
             if (reservation.IsReservation)
             {
                 return await CreateSessionReservation(id);
             }
+
             return await DeleteSessionReservation(id);
         }
 
         private async Task<IActionResult> CreateSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
-            bool sessionCanBeReserved = _context.Sessions.ToList().Where(s => s.Id == id && s.ClientId == null && Is24HoursTillSession(s.StartTime)).Any();
+            bool sessionCanBeReserved = await _context.Sessions.Where(s => s.Id == id && s.ClientId == null && Is24HoursTillSession(s.StartTime)).AnyAsync();
+
             if (sessionCanBeReserved)
             {
                 Session session = await _context.Sessions.Where(s => s.Id == id).FirstAsync();
                 session.ClientId = userId;
                 _context.Sessions.Update(session);
                 int responsew = await _context.SaveChangesAsync();
+
                 if(responsew == 0)
                 {
                     return BadRequest("This session is no longer available");
                 }
+
                 return Ok("Session have been reserved.");
             }
 
@@ -247,7 +271,7 @@ namespace Connect_Backend.Controllers
         private async Task<IActionResult> DeleteSessionReservation(int id)
         {
             int userId = int.Parse(User.Claims.First().Value);
-            Session? session =   _context.Sessions.ToList().FirstOrDefault(s => s.Id == id && s.ClientId == userId && Is24HoursTillSession(s.StartTime));
+            Session? session =  await _context.Sessions.FirstOrDefaultAsync(s => s.Id == id && s.ClientId == userId && Is24HoursTillSession(s.StartTime));
             if (session != null)
             {
                 session.ClientId = null;
@@ -270,9 +294,9 @@ namespace Connect_Backend.Controllers
             DateTime oldEnd = oldStart + TimeSpan.FromMinutes(oldDuration);
             return !(newStart < oldStart && newEnd < oldStart) && !(newStart > oldEnd && newEnd > oldEnd);
         }
-        private bool SessionExists(int id)
+        private async Task<bool> SessionExists(int id)
         {
-            return _context.Sessions.Where(u => u.Id == id).Any();
+            return await _context.Sessions.Where(u => u.Id == id).AnyAsync();
         }
     }
 }
