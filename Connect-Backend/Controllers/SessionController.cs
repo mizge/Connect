@@ -66,7 +66,7 @@ namespace Connect_Backend.Controllers
             {
                 return NotFound("No session for this therepuet is available.");
             }
-            SessionDto? session = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId)
+            SessionDto? session = await _context.Sessions.Where(s => s.ClientId == null && s.TherepuetId == therepuet.UserId && s.Id == sessionId)
                                                         .Select(s => _mapper.Map<SessionDto>(s))
                                                         .FirstOrDefaultAsync();
             if (session == default)
@@ -142,10 +142,9 @@ namespace Connect_Backend.Controllers
                 return NotFound("No session table was found.");
             }
             int userId = int.Parse(User.Claims.First().Value);
-            bool therepuetHasAnySessions = _context.Sessions.ToList().Any();
-            bool sessionsTimeImpossible = _context.Sessions.ToList().Where(s => s.TherepuetId == userId &&
-                SessionTimeNotOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes)).Any();
-            if (sessionsTimeImpossible || therepuetHasAnySessions || sessionRequest.DurationInMinutes < 0)
+            List<Session> sessionsOnThisTime = _context.Sessions.ToList().Where(s => s.TherepuetId == userId &&
+                SessionTimeOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes)).ToList();
+            if ((!sessionsOnThisTime.Any() && sessionsOnThisTime.Count > 0) || sessionRequest.DurationInMinutes < 0)
             {
                 return BadRequest("Session time invalid.");
             }
@@ -265,11 +264,11 @@ namespace Connect_Backend.Controllers
             DateTime oneDayBeforeSessionStart = start - TimeSpan.FromDays(1);
             return DateTime.UtcNow <= oneDayBeforeSessionStart;
         }
-        private bool SessionTimeNotOccupied(DateTime newStart, int newDuration, DateTime oldStart, int oldDuration)
+        private bool SessionTimeOccupied(DateTime newStart, int newDuration, DateTime oldStart, int oldDuration)
         {
             DateTime newEnd = newStart + TimeSpan.FromMinutes(newDuration);
             DateTime oldEnd = oldStart + TimeSpan.FromMinutes(oldDuration);
-            return (newStart < oldStart && newEnd < oldStart) || (newStart > oldEnd && newEnd > oldEnd);
+            return !(newStart < oldStart && newEnd < oldStart) && !(newStart > oldEnd && newEnd > oldEnd);
         }
         private bool SessionExists(int id)
         {

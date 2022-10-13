@@ -7,6 +7,7 @@ namespace Connect_Backend.Dtos
         public int Id { get; set; }
         public DateTime StartTime { get; set; }
         public int DurationInMinutes { get; set; }
+        public string Notes { get; set; }
         public UserDto Client { get; set; }
     }
 }
