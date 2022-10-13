@@ -4,7 +4,7 @@ using Connect_Backend.Dtos;
 using Connect_Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
 
 namespace Connect_Backend.Controllers
 {
@@ -22,13 +22,13 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
             if (_context.Qualifications == null)
             {
                 return NotFound("No qualification table was found.");
             }
-            List<Qualification> qualifications = _context.Qualifications.Select(q => q).ToList();
+            List<Qualification> qualifications = await _context.Qualifications.Select(q => q).ToListAsync();
             if (qualifications.Any())
             {
                 return Ok(qualifications);
@@ -37,13 +37,13 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             if (_context.Qualifications == null)
             {
                 return NotFound("No qualification table was found.");
             }
-            Qualification qualifications = _context.Qualifications.FirstOrDefault(q => q.Id == id)!;
+            Qualification? qualifications = await _context.Qualifications.FirstOrDefaultAsync(q => q.Id == id);
             if (qualifications == null)
             {
                 return NotFound("No qualification was found.");
@@ -54,7 +54,7 @@ namespace Connect_Backend.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public ActionResult Create(QualificationDto qualificationRequest)
+        public async Task<IActionResult> Create(QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
             {
@@ -66,12 +66,12 @@ namespace Connect_Backend.Controllers
                 Description = qualificationRequest.Description
             };
             _context.Qualifications.Add(qualification);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Created("", _mapper.Map<QualificationDto>(qualification));
         }
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult Edit(int id, QualificationDto qualificationRequest)
+        public async Task<IActionResult> Edit(int id, QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
             {
@@ -86,13 +86,13 @@ namespace Connect_Backend.Controllers
             qualification.Name = qualificationRequest.Name;
             qualification.Description = qualificationRequest.Description;
             _context.Qualifications.Update(qualification);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Ok("Qualification updated.");
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (_context.Qualifications == null)
             {
@@ -110,7 +110,7 @@ namespace Connect_Backend.Controllers
                 return BadRequest("The qualification cannot be deleted.");
             }
             _context.Qualifications.Remove(qualification);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return NoContent();
         }
     }

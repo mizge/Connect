@@ -145,7 +145,7 @@ namespace Connect_Backend.Controllers
             bool therepuetHasAnySessions = _context.Sessions.ToList().Any();
             bool sessionsTimeImpossible = _context.Sessions.ToList().Where(s => s.TherepuetId == userId &&
                 SessionTimeNotOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes)).Any();
-            if (!sessionsTimeImpossible || therepuetHasAnySessions || sessionRequest.DurationInMinutes < 0)
+            if (sessionsTimeImpossible || therepuetHasAnySessions || sessionRequest.DurationInMinutes < 0)
             {
                 return BadRequest("Session time invalid.");
             }
@@ -156,7 +156,7 @@ namespace Connect_Backend.Controllers
                 TherepuetId = userId
             };
             _context.Sessions.Add(session);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Created("", _mapper.Map<SessionDto>(session));
         }
         [HttpDelete("sessions/{id}")]
