@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace Connect_Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/token")]
     [ApiController]
     public class TokenController : ControllerBase
     {
