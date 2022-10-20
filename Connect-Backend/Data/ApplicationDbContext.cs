@@ -24,6 +24,7 @@ namespace Connect_Backend.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<Role>().HasKey(t => t.Id);
             builder.Entity<User>().HasOne(t => t.Role).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Therepuet>().HasOne(t => t.User).WithOne().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Therepuet>().HasMany(t => t.Sessions).WithOne(s=> s.Therepuet).OnDelete(DeleteBehavior.NoAction);

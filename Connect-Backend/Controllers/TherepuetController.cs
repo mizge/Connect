@@ -25,25 +25,27 @@ namespace Connect_Backend.Controllers
         {
             if (_context.Therepuets == null)
             {
-                return NotFound("No therepuet table was found.");
+                return NotFound(new ErrorMessage() { Message = "No therepuet table was found." });
             }
-            var therepuets = _context.TherepuetsQualifications
+
+            IQueryable<TherepuetDto> therepuets = _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
                                                         .Include( t => t.Therepuet.User)
                                                         .Select(x => x.Therepuet)
                                                         .Select(t => _mapper.Map<TherepuetDto>(t))
                                                         .AsQueryable();
-            if (therepuets.Count() < 1)
+
+            if (!therepuets.Any())
             {
-                return NotFound("No therepuets for this qualification was found.");
+                return NotFound(new ErrorMessage() { Message = "No therepuets for this qualification was found." });
             }
 
             PagedList<TherepuetDto> pagedTherepuets = await PagedList<TherepuetDto>.CreateAsync(therepuets, searchParameters.PageNumber, searchParameters.PageSize);
 
-            if (pagedTherepuets.Count() < 1)
+            if (pagedTherepuets.Count < 1)
             {
-                return NotFound("No therepuets in this page.");
+                return NotFound(new ErrorMessage() { Message = "No therepuets in this page." });
             }
 
             string? previousPageLink = pagedTherepuets.HasPrevious ? CreateTopicsResourceUri(searchParameters, ResourceUriType.PreviousPage) : null;
@@ -64,13 +66,15 @@ namespace Connect_Backend.Controllers
             Response.Headers.Add("Pagination", JsonSerializer.Serialize(paginationMetadata));
             return Ok(pagedTherepuets);
         }
+
         [HttpGet("qualifications/{qualificationId}/therepuets/{therepuetId}")]
         public async Task<IActionResult> Get(int qualificationId, int therepuetId)
         {
             if (_context.Therepuets == null)
             {
-                return NotFound("No therepuet table was found.");
+                return NotFound(new ErrorMessage() { Message = "No therepuet table was found." });
             }
+
             TherepuetDto? therepuet = await _context.TherepuetsQualifications
                                                         .Where(x => x.QualificationId == qualificationId)
                                                         .Include(x => x.Therepuet)
@@ -79,12 +83,15 @@ namespace Connect_Backend.Controllers
                                                         .Where(x => x.UserId == therepuetId)
                                                         .Select(t => _mapper.Map<TherepuetDto>(t))
                                                         .FirstOrDefaultAsync();
+
             if (therepuet == default)
             {
-                return NotFound("No such therepuet for this qualification was found.");
+                return NotFound(new ErrorMessage() { Message = "No such therepuet for this qualification was found." });
             }
+
             return Ok(therepuet);
         }
+
         private string? CreateTopicsResourceUri(TherepuetSearchParameters topicSearchParametersDto, ResourceUriType type)
         {
             return type switch

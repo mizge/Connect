@@ -1,13 +1,11 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Connect_Backend.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Connect_Backend.Helpers;
-using System.Reflection;
 using Connect_Backend.Authorization;
-using Microsoft.AspNetCore.Hosting;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,21 +14,37 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
+
 builder.Services.Configure<UserSecrets>(builder.Configuration.AddUserSecrets<Program>().Build());
 
+
+//JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 builder.Services.AddSingleton<IJwtUtils, JwtUtils>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddCookie()
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuer = true,
+            ValidateAudience = false,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration.GetSection("Issuer").Value,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(builder.Configuration.GetSection("JWTSecret").Value)),
-            ValidateIssuer = false,
-            ValidateAudience = false
         };
     });
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("EnableCORS", builder =>
+//    {
+//        builder.AllowAnyOrigin()
+//        .AllowAnyHeader()
+//        .AllowAnyMethod();
+//    });
+//});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -47,6 +61,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("EnableCORS");
 
 app.UseAuthentication();
 app.UseAuthorization();

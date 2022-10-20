@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Connect_Backend.Data;
 using Connect_Backend.Dtos;
+using Connect_Backend.Helpers;
 using Connect_Backend.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,14 +27,17 @@ namespace Connect_Backend.Controllers
         {
             if (_context.Qualifications == null)
             {
-                return NotFound("No qualification table was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification table was found." });
             }
-            List<Qualification> qualifications = await _context.Qualifications.Select(q => q).ToListAsync();
+
+            List<Qualification> qualifications = await _context.Qualifications.ToListAsync();
+
             if (qualifications.Any())
             {
                 return Ok(qualifications);
             }
-            return NotFound("No qualification was found.");
+
+            return NotFound(new ErrorMessage() { Message = "No qualification was found." });
         }
 
         [HttpGet("{id}")]
@@ -41,12 +45,14 @@ namespace Connect_Backend.Controllers
         {
             if (_context.Qualifications == null)
             {
-                return NotFound("No qualification table was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification table was found." });
             }
-            Qualification? qualifications = await _context.Qualifications.FirstOrDefaultAsync(q => q.Id == id);
+
+            Qualification? qualifications = await _context.Qualifications.FindAsync(id);
+
             if (qualifications == null)
             {
-                return NotFound("No qualification was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification was found." });
             }
 
             return Ok(qualifications);
@@ -58,36 +64,40 @@ namespace Connect_Backend.Controllers
         {
             if (_context.Qualifications == null)
             {
-                return NotFound("No qualification table was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification table was found." });
             }
-            Qualification qualification = new Qualification()
+
+            Qualification qualification = new()
             {
                 Name = qualificationRequest.Name,
                 Description = qualificationRequest.Description
             };
+
             await _context.Qualifications.AddAsync(qualification);
             await _context.SaveChangesAsync();
             return Created("", _mapper.Map<QualificationDto>(qualification));
         }
+
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
             {
-                return NotFound("No qualification table was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification table was found." });
             }
 
-            Qualification? qualification = await _context.Qualifications.FirstOrDefaultAsync(q => q.Id == id)!;
+            Qualification? qualification = await _context.Qualifications.FindAsync(id);
+
             if (qualification == null)
             {
-                return NotFound("No qualification was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification was found." });
             }
+
             qualification.Name = qualificationRequest.Name;
             qualification.Description = qualificationRequest.Description;
-            _context.Qualifications.Update(qualification);
             await _context.SaveChangesAsync();
-            return Ok("Qualification updated.");
+            return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -96,19 +106,23 @@ namespace Connect_Backend.Controllers
         {
             if (_context.Qualifications == null)
             {
-                return NotFound("No qualification table was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification table was found." });
             }
 
-            Qualification? qualification = await _context.Qualifications.FirstOrDefaultAsync(m => m.Id == id)!;
+            Qualification? qualification = await _context.Qualifications.FindAsync(id);
+
             if (qualification == null)
             {
-                return NotFound("No qualification was found.");
+                return NotFound(new ErrorMessage() { Message = "No qualification was found." });
             }
+
             int therepuetsCount = await _context.TherepuetsQualifications.Where(tq => tq.QualificationId == id).CountAsync();
+
             if(therepuetsCount > 0)
             {
-                return BadRequest("The qualification cannot be deleted.");
+                return BadRequest(new ErrorMessage() { Message = "The qualification cannot be deleted." });
             }
+
             _context.Qualifications.Remove(qualification);
             await _context.SaveChangesAsync();
             return NoContent();
