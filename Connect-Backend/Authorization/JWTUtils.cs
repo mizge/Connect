@@ -43,7 +43,8 @@ namespace Connect_Backend.Authorization
             {
                 Issuer = _appSettings.Issuer,
                 Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Sid, user.Id.ToString()), new Claim(ClaimTypes.Role, user.Role.Name.ToString().Trim()) }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
+                //Expires = DateTime.UtcNow.AddMinutes(15),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

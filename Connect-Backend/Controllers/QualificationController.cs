@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Connect_Backend.Authorization.Model;
 using Connect_Backend.Data;
 using Connect_Backend.Dtos;
 using Connect_Backend.Helpers;
@@ -59,7 +60,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Create(QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
@@ -79,7 +80,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Edit(int id, QualificationDto qualificationRequest)
         {
             if (_context.Qualifications == null)
@@ -101,7 +102,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = UserRoles.Admin)]
         public async Task<IActionResult> Delete(int id)
         {
             if (_context.Qualifications == null)

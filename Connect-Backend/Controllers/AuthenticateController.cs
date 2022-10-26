@@ -105,7 +105,7 @@ namespace Connect_Backend.Controllers
             return Created("", new AuthorizationDto() { AccessToken = jwtToken, RefreshToken = refreshToken});
         }
 
-        [HttpPost]
+        [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {

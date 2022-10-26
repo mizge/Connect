@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Connect_Backend.Authorization.Model;
 using Connect_Backend.Data;
 using Connect_Backend.Dtos;
 using Connect_Backend.Helpers;
@@ -16,11 +17,13 @@ namespace Connect_Backend.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationService _authorizationService;
 
-        public SessionController(ApplicationDbContext context, IMapper mapper)
+        public SessionController(ApplicationDbContext context, IMapper mapper, IAuthorizationService authorizationService)
         {
             _context = context;
             _mapper = mapper;
+            _authorizationService = authorizationService;
         }
         [HttpGet("qualifications/{qualificationId}/therepuets/{therepuetId}/sessions")]
         public async Task<IActionResult> GetAllByQualification(int qualificationId, int therepuetId)
@@ -84,7 +87,7 @@ namespace Connect_Backend.Controllers
         //Get therepuets/clients sessions
         // users/{userId}/sessions
         [HttpGet("sessions")]
-        [Authorize(Roles = "Client, Therepuet")]
+        [Authorize(Roles = $"{UserRoles.Therepuet}, {UserRoles.Client}")]
         public async Task<IActionResult> GetAllByUser()
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
@@ -120,7 +123,7 @@ namespace Connect_Backend.Controllers
         //Get therepuets/clients sessions
         // users/{userId}/sessions/{sessionId}
         [HttpGet("sessions/{sessionId}")]
-        [Authorize(Roles = "Client, Therepuet")]
+        [Authorize(Roles = $"{UserRoles.Therepuet}, {UserRoles.Client}")]
         public async Task<IActionResult> GetOneByUser(int sessionId)
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
@@ -152,7 +155,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpPost("sessions")]
-        [Authorize(Roles = "Therepuet")]
+        [Authorize(Roles = UserRoles.Therepuet)]
         public async Task<IActionResult> CreateSession(CreateSessionDto sessionRequest)
         {
             if (_context.Sessions == null)
@@ -161,9 +164,10 @@ namespace Connect_Backend.Controllers
             }
 
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
-            List<Session> sessionsOnThisTime = await _context.Sessions.Where(s => s.TherepuetId == userId &&
+            List<Session> sessionsOnThisTime = _context.Sessions.ToList()
+                                                                .Where(s => s.TherepuetId == userId &&
                                                                       SessionTimeOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes))
-                                                                      .ToListAsync();
+                                                                .ToList();
 
             if ((!sessionsOnThisTime.Any() && sessionsOnThisTime.Count > 0) || sessionRequest.DurationInMinutes < 0)
             {
@@ -183,7 +187,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpDelete("sessions/{id}")]
-        [Authorize(Roles = "Therepuet")]
+        [Authorize(Roles = UserRoles.Therepuet)]
         public async Task<IActionResult> DeleteSession(int id)
         {
             if (_context.Sessions == null)
@@ -210,7 +214,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpPatch("sessions/{id}/note")]
-        [Authorize(Roles = "Therepuet")]
+        [Authorize(Roles = UserRoles.Therepuet)]
         public async Task<IActionResult> UpdateSessionNote(int id, [FromBody] NoteDto notes)
         {
             if (_context.Sessions == null)
@@ -223,12 +227,11 @@ namespace Connect_Backend.Controllers
                 return NotFound(new ErrorMessage() { Message = "No session was found." });
             }
 
-            int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
-            bool sessionCanBeUpdated = await _context.Sessions.AnyAsync(s => s.Id == id && s.ClientId != null && s.SessionHasEnded());
-
-            if (sessionCanBeUpdated)
+            Session session = await _context.Sessions.FirstAsync(s => s.Id == id);
+            AuthorizationResult authorizationResult = await _authorizationService.AuthorizeAsync(User, session, PolicyNames.ResourceOwner);
+            bool sessionCanBeUpdated = session.ClientId != null && session.SessionHasEnded();
+            if (authorizationResult.Succeeded && sessionCanBeUpdated)
             {
-                Session session = await _context.Sessions.FirstAsync(s => s.Id == id);
                 session.Notes = notes.Notes;
                 await _context.SaveChangesAsync();
                 return Ok();
@@ -238,7 +241,7 @@ namespace Connect_Backend.Controllers
         }
 
         [HttpPatch("sessions/{id}/reservation")]
-        [Authorize(Roles = "Client")]
+        [Authorize(Roles = UserRoles.Client)]
         public async Task<IActionResult> UpdateSessionReservation(int id, [FromBody] ReservationDto reservation)
         {
             if (_context.Sessions == null)

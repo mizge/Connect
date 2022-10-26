@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Connect_Backend.Authorization.Model;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace Connect_Backend.Models
 {
-    public class Session
+    public class Session : ITherepuetOwnedResource
     {
         public int Id { get; set; }
         public DateTime StartTime { get; set; }

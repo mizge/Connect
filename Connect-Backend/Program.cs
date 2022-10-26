@@ -5,6 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Connect_Backend.Helpers;
 using Connect_Backend.Authorization;
+using Connect_Backend.Seeders;
+using Connect_Backend.Authorization.Model;
+using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +23,7 @@ builder.Services.Configure<UserSecrets>(builder.Configuration.AddUserSecrets<Pro
 
 //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 builder.Services.AddSingleton<IJwtUtils, JwtUtils>();
+builder.Services.AddScoped<AuthDbSeeder>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddCookie()
     .AddJwtBearer(options =>
@@ -36,15 +40,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("EnableCORS", builder =>
-//    {
-//        builder.AllowAnyOrigin()
-//        .AllowAnyHeader()
-//        .AllowAnyMethod();
-//    });
-//});
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(PolicyNames.ResourceOwner, policy => policy.Requirements.Add(new ResourceOwnerRequirement()));
+});
+
+builder.Services.AddSingleton<IAuthorizationHandler, ResourceOwnerAuthorizationHandler>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -68,4 +69,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var dbSeeder = app.Services.CreateScope().ServiceProvider.GetRequiredService<AuthDbSeeder>();
+await dbSeeder.SeedAsync();
+
 app.Run();

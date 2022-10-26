@@ -8,6 +8,7 @@ using AutoMapper;
 using Connect_Backend.Dtos;
 using System.Security.Claims;
 using Connect_Backend.Helpers;
+using Connect_Backend.Authorization.Model;
 
 namespace Connect_Backend.Controllers
 {
@@ -27,7 +28,7 @@ namespace Connect_Backend.Controllers
         // Get users sessions homeworks
         // users/{userId}/sessions/{sessionId}/homeworks
         [HttpGet("sessions/{sessionId}/homeworks")]
-        [Authorize(Roles = "Client, Therepuet")]
+        [Authorize(Roles = $"{UserRoles.Therepuet}, {UserRoles.Client}")]
         public async Task<IActionResult> GetAll(int sessionId)
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
@@ -55,7 +56,7 @@ namespace Connect_Backend.Controllers
         // Get users sessions homework
         // users/{userId}/sessions/{sessionId}/homeworks/{homeworksId}
         [HttpGet("sessions/{sessionId}/homeworks/{homeworkId}")]
-        [Authorize(Roles = "Client, Therepuet")]
+        [Authorize(Roles = $"{UserRoles.Therepuet}, {UserRoles.Client}")]
         public async Task<IActionResult> Get(int sessionId, int homeworkId)
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
@@ -76,10 +77,11 @@ namespace Connect_Backend.Controllers
 
             return Ok(_mapper.Map<HomeworkDto>(homework));
         }
+
         // Create therepuets sessions homework
         // therepuets/{therepuetId}/sessions/{sessionId}/homeworks/{homeworksId}
         [HttpPost("sessions/{sessionId}/homeworks")]
-        [Authorize(Roles = "Therepuet")]
+        [Authorize(Roles = UserRoles.Therepuet)]
         public async Task<IActionResult> Create(int sessionId, HomeworkDto homeworksRequests)
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
@@ -102,7 +104,7 @@ namespace Connect_Backend.Controllers
         // Update therepuets sessions homework
         // therepuets/{therepuetId}/sessions/{sessionId}/homeworks/{homeworksId}
         [HttpPut("sessions/{sessionId}/homeworks/{homeworkId}")]
-        [Authorize(Roles = "Therepuet")]
+        [Authorize(Roles = UserRoles.Therepuet)]
         public async Task<IActionResult> Edit(int sessionId, int homeworkId, HomeworkDto homeworksRequests)
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
@@ -129,7 +131,7 @@ namespace Connect_Backend.Controllers
         // Deleye therepuets sessions homework
         // therepuets/{therepuetId}/sessions/{sessionId}/homeworks/{homeworksId}
         [HttpDelete("sessions/{sessionId}/homeworks/{homeworkId}")]
-        [Authorize(Roles = "Therepuet")]
+        [Authorize(Roles = UserRoles.Therepuet)]
         public async Task<IActionResult> Delete(int sessionId, int homeworkId)
         {
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
