@@ -18,7 +18,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 
-builder.Services.Configure<UserSecrets>(builder.Configuration.AddUserSecrets<Program>().Build());
+builder.Services.Configure<UserSecrets>(builder.Configuration.GetSection("Jwt"));
 
 
 //JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -34,9 +34,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration.GetSection("Issuer").Value,
+            ValidIssuer = builder.Configuration.GetSection("Jwt").GetValue<string>("Issuer"),
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(builder.Configuration.GetSection("JWTSecret").Value)),
+                .GetBytes(builder.Configuration.GetSection("Jwt").GetValue<string>("JWTSecret"))),
         };
     });
 

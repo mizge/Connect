@@ -201,7 +201,7 @@ namespace Connect_Backend.Controllers
             }
 
             int userId = int.Parse(User.Claims.First(x => x.Type == ClaimTypes.Sid).Value);
-            bool sessionCanBeDeleted = await _context.Sessions.AnyAsync(s => s.Id == id && s.ClientId == null);
+            bool sessionCanBeDeleted = await _context.Sessions.AnyAsync(s => s.Id == id && s.ClientId == null && s.TherepuetId == userId);
 
             if (sessionCanBeDeleted)
             {

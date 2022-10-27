@@ -76,7 +76,7 @@ namespace Connect_Backend.Controllers
 
             await _context.Qualifications.AddAsync(qualification);
             await _context.SaveChangesAsync();
-            return Created("", _mapper.Map<QualificationDto>(qualification));
+            return Created("", qualification);
         }
 
         [HttpPut("{id}")]

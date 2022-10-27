@@ -125,7 +125,7 @@ namespace Connect_Backend.Controllers
             homework.Task = homeworksRequests.Task;
             homework.Time = homeworksRequests.Time;
             await _context.SaveChangesAsync();
-            return Ok(homework);
+            return Ok();
         }
 
         // Deleye therepuets sessions homework

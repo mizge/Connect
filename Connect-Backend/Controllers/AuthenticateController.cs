@@ -69,6 +69,7 @@ namespace Connect_Backend.Controllers
             Therepuet therepuet = new()
             {
                 UserId = user.Id,
+                Description = request.Description,
                 User = user
             };
 
