@@ -48,9 +48,9 @@ namespace Connect_Backend.Controllers
                 return NotFound(new ErrorMessage() { Message = "No therepuets in this page." });
             }
 
-            string? previousPageLink = pagedTherepuets.HasPrevious ? CreateTopicsResourceUri(searchParameters, ResourceUriType.PreviousPage) : null;
+            string? previousPageLink = pagedTherepuets.HasPrevious ? CreateTherepuetsResourceUri(searchParameters, ResourceUriType.PreviousPage) : null;
             string? nextPageLink = pagedTherepuets.HasNext ?
-                CreateTopicsResourceUri(searchParameters,
+                CreateTherepuetsResourceUri(searchParameters,
                     ResourceUriType.NextPage) : null;
 
             var paginationMetadata = new
@@ -92,7 +92,7 @@ namespace Connect_Backend.Controllers
             return Ok(therepuet);
         }
 
-        private string? CreateTopicsResourceUri(TherepuetSearchParameters topicSearchParametersDto, ResourceUriType type)
+        private string? CreateTherepuetsResourceUri(TherepuetSearchParameters topicSearchParametersDto, ResourceUriType type)
         {
             return type switch
             {

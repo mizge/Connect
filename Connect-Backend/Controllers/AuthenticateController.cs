@@ -103,7 +103,7 @@ namespace Connect_Backend.Controllers
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(2);
             _context.SaveChanges();
-            return Created("", new AuthorizationDto() { AccessToken = jwtToken, RefreshToken = refreshToken});
+            return Created("", new AuthorizationDto() { AccessToken = jwtToken, RefreshToken = refreshToken, RoleId = user.RoleId});
         }
 
         [HttpPost("logout")]

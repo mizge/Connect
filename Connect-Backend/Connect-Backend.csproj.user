@@ -11,5 +11,6 @@
     <WebStackScaffolding_DbContextTypeFullName>Connect_Backend.Data.ApplicationDbContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <WebStackScaffolding_IsViewGenerationSelected>True</WebStackScaffolding_IsViewGenerationSelected>
+    <NameOfLastUsedPublishProfile>C:\Users\Ugne\Desktop\Ruduo_22\Saitynai\Connect\Connect\Connect-Backend\Properties\PublishProfiles\Connect-API-KTU - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>
