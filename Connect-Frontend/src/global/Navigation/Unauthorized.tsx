@@ -27,7 +27,7 @@ export const UnauthorizedNav = (props:any ) =>{
           navigate(`user`)
         }
         else if(page == "Register"){
-          navigate(`user\\client`)
+          navigate(`/register`)
         }
         setAnchorElNav(null);
       };

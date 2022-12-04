@@ -2,6 +2,8 @@ import axios, { AxiosError } from 'axios'
 import React from 'react'
 import { LoginRequest } from '../contracts/auth/LoginRequest';
 import { LoginResponse } from '../contracts/auth/LoginResponse';
+import { RegisterClientRequest } from '../contracts/auth/RegisterClientRequest';
+import { RegisterTherepuetRequest } from '../contracts/auth/RegisterTherepuetRequest';
 
 axios.interceptors.request.use(function (config) {
 	const token = "";//store.getState().user.token;
@@ -13,7 +15,7 @@ axios.interceptors.request.use(function (config) {
 
 const API_URL = process.env.REACT_APP_BACKEND;
 
-const qualificationUri = API_URL+ 'user';
+const userUri = API_URL+ 'user';
 
 class UserService {
 
@@ -21,7 +23,7 @@ class UserService {
 	{
         let loginResponse:LoginResponse = { accessToken: '', refreshToken:'', roleId:-1, error: ''};
         try {
-            const response = await axios.post(qualificationUri, params, {headers:{'Content-Type': 'application/json'}});
+            const response = await axios.post(userUri, params, {headers:{'Content-Type': 'application/json'}});
             loginResponse.accessToken = response.data.accessToken
             loginResponse.refreshToken = response.data.refreshToken
             loginResponse.roleId = response.data.roleId
@@ -32,6 +34,25 @@ class UserService {
 		}
 		return loginResponse;
 	}
-
+	async registerTherepuet(params:RegisterTherepuetRequest): Promise<boolean>
+	{
+        let res =false
+        try {
+            const response = await axios.post(`${userUri}/therepuet`, params, {headers:{'Content-Type': 'application/json'}});
+            res = true
+		} catch (err) {
+		}
+		return res;
+	}
+	async registerClient(params:RegisterClientRequest): Promise<boolean>
+	{
+        let res =false
+        try {
+            const response = await axios.post(`${userUri}/client`, params, {headers:{'Content-Type': 'application/json'}});
+            res = true
+		} catch (err) {
+		}
+		return res;
+	}
 }
 export default new UserService ();

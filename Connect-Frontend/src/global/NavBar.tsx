@@ -18,8 +18,8 @@ const NavBar = (props:any) => {
 
  if(roleId == 1){
   return (
-    <AppBar position="static" style={{background:'#9b9bca '}}>
-      <Container maxWidth="xl" >
+    <AppBar position="static" style={{background:'#9b9bca ', position:"fixed",top:"0px",  zIndex:"9999"}}>
+      <Container maxWidth="xl" sx={{}}>
         <Toolbar disableGutters>
           <AdminNav pages={AdminPages}/>
         </Toolbar>
@@ -29,7 +29,7 @@ const NavBar = (props:any) => {
  }
  else if(roleId == 2){
   return (
-    <AppBar position="static" style={{background:'#9b9bca '}}>
+    <AppBar position="static" style={{background:'#9b9bca ',  position:"fixed", top:"0px",zIndex:"9999"}}>
       <Container maxWidth="xl" >
         <Toolbar disableGutters>
           <TherepuetNav pages={TherepuetPages}/>
@@ -40,7 +40,7 @@ const NavBar = (props:any) => {
  }
  else if(roleId == 3){
   return (
-    <AppBar position="static" style={{background:'#9b9bca '}}>
+    <AppBar position="static" style={{background:'#9b9bca ', position:"fixed",top:"0px", zIndex:"9999"}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <UserNav pages={UserPages}/>
@@ -51,8 +51,8 @@ const NavBar = (props:any) => {
  }
  else{
   return (
-    <AppBar position="static" style={{background:'#9b9bca '}}>
-      <Container maxWidth="xl">
+    <AppBar position="static" style={{background:'#9b9bca ', position:"fixed", top:"0px", zIndex:"9999"}}>
+      <Container maxWidth="xl" sx={{}}>
         <Toolbar disableGutters>
           <UnauthorizedNav pages={SystemPages}/>
         </Toolbar>

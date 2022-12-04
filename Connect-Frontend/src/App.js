@@ -9,55 +9,59 @@ import Sessions from "./pages/Sessions/Sessions";
 import SessionInfo from "./pages/Sessions/SessionInfo";
 import Therepuets from "./pages/Therepuets/Therepuets";
 import TherepuetInfo from "./pages/Therepuets/TherepuetInfo";
-import { store } from "./app/store";
-import UpdateNotes from './pages/Notes/UpdateNotes'
-import CreateHomework from './pages/Homework/CreateHomework'
-import UpdateHomework from './pages/Homework/UpdateHomework'
-import CreateSession from './pages/Sessions/Therepuet/CreateSession'
+import UpdateNotes from "./pages/Notes/UpdateNotes";
+import CreateHomework from "./pages/Homework/CreateHomework";
+import UpdateHomework from "./pages/Homework/UpdateHomework";
+import CreateSession from "./pages/Sessions/Therepuet/CreateSession";
+import Qualifications from "./pages/Qualifications/Qualifications";
+import UpdateQualification from "./pages/Qualifications/UpdateQualification";
+import CreateQualification from "./pages/Qualifications/CreateQualification";
+import Footer from "./global/Footer";
 function App() {
   return (
     <div>
       <Navbar />
-      <Routes>
-        <Route exact path="/" element={<Home />} />
-        <Route path="/user" element={<Login />} />
-        <Route path="/user/client" element={<RegisterUser />} />
-        <Route path="/user/therepuet" element={<RegisterTherepuet />} />
+      <div style={{marginBottom:"100px"}}>
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route path="/user" element={<Login />} />
+          <Route path="/register-therepuet" element={<RegisterTherepuet />} />
+          <Route path="/register" element={<RegisterUser />} />
 
-        <Route path="/">
-          <Route path="/sessions" element={<Sessions />}/>
-          <Route path="/new-session" element={<CreateSession />}/>
-          <Route path="/sessions/:sessionId">
-            <Route index element={<SessionInfo />} />
+          <Route path="/">
+            <Route path="/qualifications" element={<Qualifications />} />
+            <Route
+              path="/new-qualification"
+              element={<CreateQualification />}
+            />
+            <Route path="/qualifications/:qualificationId">
+              <Route index element={<UpdateQualification />} />
+            </Route>
+            <Route path="/sessions" element={<Sessions />} />
+            <Route path="/new-session" element={<CreateSession />} />
+            <Route path="/sessions/:sessionId">
+              <Route index element={<SessionInfo />} />
+            </Route>
+            <Route path="/sessions/:sessionId/notes">
+              <Route index element={<UpdateNotes />} />
+            </Route>
+            <Route path="/sessions/:sessionId/homeworks">
+              <Route index element={<CreateHomework />} />
+            </Route>
+            <Route path="/sessions/:sessionId/homeworks/:homeworkId">
+              <Route index element={<UpdateHomework />} />
+            </Route>
           </Route>
-          <Route path="/sessions/:sessionId/notes">
-            <Route index element={<UpdateNotes />} />
-          </Route>
-          <Route path="/sessions/:sessionId/homeworks">
-            <Route index element={<CreateHomework />} />
-          </Route>
-          <Route path="/sessions/:sessionId/homeworks/:homeworkId">
-            <Route index element={<UpdateHomework />} />
-          </Route>
-        </Route>
 
-        <Route path="/qualifications/:qualificationId/therepuets/">
-          <Route index element={<Therepuets />} />
-          <Route path="/qualifications/:qualificationId/therepuets/:therepuetId">
-            <Route index element={<TherepuetInfo />} />
-            {/* <Route path='edit' element={<ProtectedRoute/>}>
-									<Route index element={<EditMovie/>}/>
-								</Route> */}
-            {/* Here I will have create session? only for therepuets
-                <Route path='sessions'>
-									<Route index element={<Sessions/>}/>
-									<Route path='create' element={<ProtectedRoute/>}>
-										<Route index element={<CreateSession/>}/>
-									</Route>
-								</Route> */}
+          <Route path="/qualifications/:qualificationId/therepuets/">
+            <Route index element={<Therepuets />} />
+            <Route path="/qualifications/:qualificationId/therepuets/:therepuetId">
+              <Route index element={<TherepuetInfo />} />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </div>
+      <Footer />
     </div>
   );
 }

@@ -35,7 +35,7 @@ function Login() {
 
 		} else {
       		dispatch(setUser(loginResponse));
-			navigate('/sessions');
+			navigate('/');
 		}
 	}
   return (
@@ -49,7 +49,7 @@ function Login() {
 					alignItems: 'center',
 				}}
 			>
-				<Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+				<Avatar sx={{ m: 1, bgcolor: 'secondary.main', marginTop:7 }}>
 					<LockOutlinedIcon />
 				</Avatar>
 				<Typography component="h1" variant="h5">
