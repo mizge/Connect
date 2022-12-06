@@ -10,6 +10,8 @@ import RegisteredSession from "./RegisteredSession";
 import { useAppSelector } from '../../../app/hooks'
 import Unauthorized from "../../../global/Unauthorized";
 import FreeSession from "./FreeSession";
+import { CssBaseline } from "@mui/material";
+import NotFound from "../../../global/NotFound";
 
 const TherepuetSessionInfo = (props: any) => {
   const roleId:number  = useAppSelector((state) => state.user.roleId);
@@ -26,19 +28,26 @@ const TherepuetSessionInfo = (props: any) => {
     const session = await sessionsService.getTherepuetSession(
       Number(props.sessionId)
     );
-    if(session.client != null){
+
+    if(session!=null){
+      if(session.client != null){
         setIsReserved(true)
     }
-    setSession(session);
+      setSession(session);
+    }
+
   }
   if(roleId == 2){
+    if(session== null){
+      return <NotFound/>
+    }
     return (
       <main>
-        {/* Hero unit */}
+        <CssBaseline />
         <Box
           sx={{
             bgcolor: "background.paper",
-            pt: 3,
+            pt: 8,
             pb: 4,
           }}
         ></Box>

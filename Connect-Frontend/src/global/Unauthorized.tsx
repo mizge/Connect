@@ -14,9 +14,6 @@ const Unauthorized = () => {
         <h3 className="w3-center w3-animate-right">
           You dont have permission to view this site.
         </h3>
-        <h6 className="w3-center w3-animate-zoom">
-          error code:401 unauthorized
-        </h6>
       </div>
     </>
   );

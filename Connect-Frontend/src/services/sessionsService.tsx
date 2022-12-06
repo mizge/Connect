@@ -44,12 +44,15 @@ class SessionService {
 			return [];
 		}
 	}
-	async getClientSession(sessionId: number): Promise<GetClientSessionResponse>
+	async getClientSession(sessionId: number): Promise<GetClientSessionResponse|null>
 	{
-		const uri = `${sessionUri}/${sessionId}`;
-		const response = await axios.get(uri, { headers: {} });
-
-		return response.data;
+		try {
+			const uri = `${sessionUri}/${sessionId}`;
+			const response = await axios.get(uri, { headers: {} });
+			return response.data;
+		} catch (err) {
+			return null;
+		}
 	}
 	async CancelReservation(sessionId:number): Promise<string>{
 		const params:ReservationRequest = {isReservation:false}
@@ -82,12 +85,18 @@ class SessionService {
 			return [];
 		}
 	}
-	async getTherepuetSession(sessionId: number): Promise<GetTherepuetSessionResponse>
+	async getTherepuetSession(sessionId: number): Promise<GetTherepuetSessionResponse|null>
 	{
-		const uri = `${sessionUri}/${sessionId}`;
-		const response = await axios.get(uri, { headers: {} });
+		try {
+			const uri = `${sessionUri}/${sessionId}`;
+			const response = await axios.get(uri, { headers: {} });
+			
 
 		return response.data;
+		} catch (err) {
+			return null;
+		}
+
 	}
 	async updateNotes(sessionId:number, notes:string): Promise<string>{
 		const params:NotesRequest = {notes:notes}

@@ -20,8 +20,9 @@ import {
   FormControlLabel,
   FormGroup,
   FormLabel,
+  TextareaAutosize,
 } from "@mui/material";
-import { Textarea } from "@mui/joy";
+import Textarea from "@mui/joy/Textarea";
 import { RegisterTherepuetRequest } from "../contracts/auth/RegisterTherepuetRequest";
 import userService from "../services/userService";
 import { sleep } from "../helpers/Sleep";
@@ -203,14 +204,14 @@ const RegisterTherepuet = () => {
                 variant="standard"
               >
                 <FormLabel sx={{ width: "100%" }}>Describe your self!</FormLabel>
-                <Textarea
-                  variant="outlined"
+                <TextField
+                multiline
+                variant="outlined"
                   minRows={4}
-                  aria-label="Description"
                   placeholder="Description"
                   id="description"
                   name="description"
-                  sx={{borderColor:"lightgrey"}}
+                  style={{borderColor:"lightgrey", borderRadius:"2%", fontFamily:"inherit"}}
                   onChange={(e:any)=>{setDescription(e.target.value)}}
                 />
               </FormControl>
@@ -226,16 +227,17 @@ const RegisterTherepuet = () => {
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2, background:"#8a8ac1" }}
+            sx={{ mt: 3, mb: 2 }}
           >
             Register
           </Button>
           <Button
+                          color="secondary"
             onClick={registerClient}
             type="submit"
             fullWidth
             variant="contained"
-            sx={{  mb: 2, background:"#bcbcdc" }}
+            sx={{  mb: 2 }}
           >
             Register as client
           </Button>

@@ -30,7 +30,6 @@ const Footer = () => {
             letterSpacing: ".3rem",
             color: "inherit",
             textDecoration: "none",
-            fontFamily: "Segoe UI",
           }}
         >
           Connect - provided by Ugnė Glinskytė

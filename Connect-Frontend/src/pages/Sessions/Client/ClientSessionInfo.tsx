@@ -15,12 +15,13 @@ import { StyledTableCell } from "../../../components/StyledTableCell";
 import { StyledTableRow } from "../../../components/StyledTableRow";
 import { monthNames } from "../../../components/Months";
 import Typography from "@mui/material/Typography";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, CssBaseline } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Button from '@mui/material/Button';
 import { GetHomeWorkResponse as Homeworok } from "../../../contracts/homework/GetHomeWorkResponse";
 import homeworkService from "../../../services/homeworkService";
 import {sleep} from "../../../helpers/Sleep"
+import NotFound from "../../../global/NotFound";
 
 const ClientSessionInfo = (props:any) => {
     const [session, setSession] = useState<Session>();
@@ -35,10 +36,12 @@ const ClientSessionInfo = (props:any) => {
     // methods
     async function fetchData() {
       const session = await sessionsService.getClientSession(Number(props.sessionId));
-      setSession(session);
-      const homeworks = await homeworkService.getHomeWorks(Number(props.sessionId));
-      setHomeworks(homeworks)
-      setIsLoading(false);
+      if(session != null){
+        setSession(session);
+        const homeworks = await homeworkService.getHomeWorks(Number(props.sessionId));
+        setHomeworks(homeworks)
+        setIsLoading(false);
+      }
     }
     function sessionCanBeCanceled(){
         const date = new Date(session?.startTime? session?.startTime: "")
@@ -60,7 +63,9 @@ const ClientSessionInfo = (props:any) => {
         }
 
     }
-  
+  if(session == null){
+    return <NotFound/>
+  }
     return (
       <main>
         {/* Hero unit */}
@@ -72,6 +77,7 @@ const ClientSessionInfo = (props:any) => {
           }}
         ></Box>
         <Container sx={{ py: 1 }} maxWidth="lg">
+        <CssBaseline />
           <Stack direction={"column"} spacing={2}>
             <h1 style={{ width: "100%", textAlign: "left", marginBottom:"0px" }}>
               Session on {monthNames[new Date(session?.startTime?session?.startTime:"").getMonth()]}{" "} {new Date(session?.startTime?session?.startTime:"").getDate()}

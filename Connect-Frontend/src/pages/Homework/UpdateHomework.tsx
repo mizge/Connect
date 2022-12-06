@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Container,
+  CssBaseline,
   FormLabel,
   Stack,
   TextareaAutosize,
@@ -23,6 +24,7 @@ import { CreateHomeWorkRequest as Homework } from "../../contracts/homework/Crea
 import homeworkService from "../../services/homeworkService";
 import { useNavigate } from "react-router-dom";
 import { sleep } from "../../helpers/Sleep";
+import NotFound from "../../global/NotFound";
 
 const UpdateHomework = () => {
   const roleId: number = useAppSelector((state) => state.user.roleId);
@@ -41,11 +43,13 @@ const UpdateHomework = () => {
     const session = await sessionsService.getTherepuetSession(
       Number(sessionId)
     );
-    setSession(session);
-    const homework = await homeworkService.getHomeWork(Number(sessionId), Number(homeworkId))
-    if(homework != null){
-        setTime(homework.time);
-        setTask(homework.task);
+    if(session != null){
+      setSession(session);
+      const homework = await homeworkService.getHomeWork(Number(sessionId), Number(homeworkId))
+      if(homework != null){
+          setTime(homework.time);
+          setTask(homework.task);
+      }
     }
   }
   async function handleSumbit() {
@@ -73,9 +77,12 @@ const UpdateHomework = () => {
   }
 
   if (roleId == 2) {
+    if(session == null || task==""){
+      return <NotFound/>
+    }
     return (
       <main>
-        {/* Hero unit */}
+         	  <CssBaseline />
         <Box
           sx={{
             bgcolor: "background.paper",
@@ -104,9 +111,10 @@ const UpdateHomework = () => {
           </Stack>
 
           <Box sx={{ mt: 1 }}>
-            <Textarea
+            <TextField
+            multiline
               minRows={4}
-              aria-label="Task"
+              label="Task"
               placeholder="Task"
               id="task"
               name="task"

@@ -15,7 +15,7 @@ import { StyledTableCell } from "../../../components/StyledTableCell";
 import { StyledTableRow } from "../../../components/StyledTableRow";
 import { monthNames } from "../../../components/Months";
 import Typography from "@mui/material/Typography";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, CssBaseline } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Button from '@mui/material/Button';
 
@@ -50,6 +50,7 @@ const ClientSessions = () => {
         }}
       ></Box>
       <Container sx={{ py: 1 }} maxWidth="lg">
+      <CssBaseline />
         <Stack direction={"column"} spacing={2}>
           <h1 style={{ width: "100%", textAlign: "center" }}>
             Registered Sessions

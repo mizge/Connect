@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Container,
+  CssBaseline,
   Stack,
   TextField,
 } from "@mui/material";
@@ -49,23 +50,21 @@ const UpdateQualification = () => {
     );
     if (res != "") {
       navigate(`/qualifications`);
-    }
-    else{
-      setError(true)
-      await sleep(5000)
-      setError(false)
+    } else {
+      setError(true);
+      await sleep(5000);
+      setError(false);
     }
   }
-
 
   if (roleId == 1) {
     return (
       <main>
-        {/* Hero unit */}
+        <CssBaseline />
         <Box
           sx={{
             bgcolor: "background.paper",
-            pt: 3,
+            pt: 8,
             pb: 4,
           }}
         ></Box>
@@ -79,7 +78,7 @@ const UpdateQualification = () => {
           </Stack>
 
           <Box sx={{ mt: 1 }}>
-          <TextField
+            <TextField
               id="name"
               label="Name"
               type="text"
@@ -90,9 +89,10 @@ const UpdateQualification = () => {
                 shrink: true,
               }}
               value={name}
-              style={{marginBottom: "30px"}}
+              style={{ marginBottom: "30px" }}
             />
-            <Textarea
+            <TextField
+              multiline
               minRows={4}
               aria-label="Description"
               placeholder="Description"
@@ -117,7 +117,7 @@ const UpdateQualification = () => {
             fullWidth
             variant="contained"
             disabled={!(name && description)}
-            sx={{ mt: 3, mb: 2, background: "#9b9bca"}}
+            sx={{ mt: 3, mb: 2, background: "#9b9bca" }}
           >
             Save
           </Button>
@@ -127,7 +127,7 @@ const UpdateQualification = () => {
             severity="error"
             style={{
               position: "fixed",
-              bottom: "10px",
+              bottom: "90px",
               right: "20px",
               width: "150px",
             }}

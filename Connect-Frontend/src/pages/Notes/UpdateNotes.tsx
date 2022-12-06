@@ -4,11 +4,12 @@ import { monthNames } from "../../components/Months";
 import { useParams } from "react-router-dom";
 import { GetTherepuetSessionResponse as Session } from "../../contracts/sessions/GetTherepuetSessionResponse";
 import sessionsService from "../../services/sessionsService";
-import {Container, Button, Alert, AlertTitle } from "@mui/material";
+import {Container, Button, Alert, AlertTitle, TextField, CssBaseline } from "@mui/material";
 import {Textarea, Box} from "@mui/joy";
 import { sleep } from "../../helpers/Sleep";
 import Unauthorized from "../../global/Unauthorized";
 import { useAppSelector } from '../../app/hooks'
+import NotFound from "../../global/NotFound";
 
 const UpdateNotes = () => {
   const roleId:number  = useAppSelector((state) => state.user.roleId);
@@ -25,8 +26,10 @@ const UpdateNotes = () => {
     const session = await sessionsService.getTherepuetSession(
       Number(sessionId)
     );
-    setSession(session);
-    setNotes(session.notes)
+    if(session != null){
+      setSession(session);
+      setNotes(session.notes)
+    }
   }
   async function saveNotes(){
     const res = await sessionsService.updateNotes(
@@ -41,16 +44,20 @@ const UpdateNotes = () => {
 
   }
   if(roleId == 2){
+    if(session == null){
+      return <NotFound/>
+    }
     return (
       <main>
         {/* Hero unit */}
         <Box
           sx={{
             bgcolor: "background.paper",
-            pt: 3,
+            pt: 8,
             pb: 4,
           }}
         ></Box>
+        	  <CssBaseline />
         <Container sx={{ py: 1 }} maxWidth="lg">
           <Stack>
             <h1 style={{ width: "100%", textAlign: "left", marginBottom: "0px" }}>
@@ -69,16 +76,17 @@ const UpdateNotes = () => {
             </h2>
           </Stack>
           <Box sx={{ mt: 1 }}>
-            <Textarea
+            <TextField
+            multiline
+            label="Notes"
               variant="outlined"
-              color="info"
               minRows={4}
               aria-label="Notes"
               defaultValue={notes}
               id="notes"
               name="notes"
               onChange={(e:any)=>{setNotes(e.target.value)}}
-              autoFocus
+              sx={{width:"100%"}}
             />
           </Box>
           <Button onClick={saveNotes}
@@ -93,7 +101,7 @@ const UpdateNotes = () => {
         {saved ? (
           <Alert
             severity="success"
-            style={{ position: "fixed", bottom: "10px", right: "20px", width:"150px" }}
+            style={{ position: "fixed", bottom: "90px", right: "20px"}}
           >
             <AlertTitle>Saved</AlertTitle>
             Notes updated

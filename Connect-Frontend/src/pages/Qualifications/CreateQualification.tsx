@@ -7,6 +7,7 @@ import {
   Box,
   Button,
   Container,
+  CssBaseline,
   Stack,
   TextField,
 } from "@mui/material";
@@ -45,11 +46,11 @@ const CreateQualification = () => {
   if (roleId == 1) {
     return (
       <main>
-        {/* Hero unit */}
+            			<CssBaseline />
         <Box
           sx={{
             bgcolor: "background.paper",
-            pt: 3,
+            pt: 8,
             pb: 4,
           }}
         ></Box>
@@ -76,10 +77,12 @@ const CreateQualification = () => {
               value={name}
               style={{marginBottom: "30px"}}
               placeholder="Name"
+              required
             />
-            <Textarea
+            <TextField
+            multiline
               minRows={4}
-              aria-label="Description"
+              label="Description"
               placeholder="Description"
               id="description"
               name="description"

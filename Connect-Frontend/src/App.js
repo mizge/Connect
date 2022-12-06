@@ -17,8 +17,13 @@ import Qualifications from "./pages/Qualifications/Qualifications";
 import UpdateQualification from "./pages/Qualifications/UpdateQualification";
 import CreateQualification from "./pages/Qualifications/CreateQualification";
 import Footer from "./global/Footer";
+import theme from './theme'
+import { ThemeProvider } from "@mui/material/styles";
+
+
 function App() {
   return (
+    <ThemeProvider theme={theme}>
     <div>
       <Navbar />
       <div style={{marginBottom:"100px"}}>
@@ -63,6 +68,7 @@ function App() {
       </div>
       <Footer />
     </div>
+    </ThemeProvider>
   );
 }
 export default App;

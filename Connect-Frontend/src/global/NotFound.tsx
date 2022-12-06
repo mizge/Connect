@@ -1,6 +1,6 @@
 import React from "react";
 
-const Forbidden = () => {
+const NotFound = () => {
   return (
     <div className="w3-display-middle">
       <link
@@ -8,14 +8,13 @@ const Forbidden = () => {
         href="https://www.w3schools.com/w3css/4/w3.css"
       ></link>
       <h1 className="w3-jumbo w3-animate-top w3-center">
-        <code>Access Denied</code>
+        <code>Page Not Found</code>
       </h1>
       <h3 className="w3-center w3-animate-right">
-        You dont have permission to view this site.
+        We couldn't fecth you any data with this request.
       </h3>
-    
     </div>
   );
 };
 
-export default Forbidden;
+export default NotFound;

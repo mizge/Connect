@@ -860,3 +860,46 @@ Sėkmingo rezultato kodas: 204.
 |404| Kvalifikacija nebuvo rasta|
 |403| Jei vartotojas neturi tinkamos rolės|
 |401| Vartotojas nėra autorizuotas|
+
+# Sistemos langai
+## Informacinis sistemos langas
+![](1.png)
+
+## Terapeutų pagal klasifikaciją langas
+![](2.png)
+
+## Klientų rezervuotų sesijų langas
+![](3.png)
+
+## Klientų rezervuotos sesijos langas
+![](4.png)
+
+## Terapeuto sesijų langas
+![](5.png)
+
+## Terapeuto užrezervuotos sesijos langas
+![](6.png)
+
+## Terapeuto sesijos užrašų langas
+![](7.png)
+
+## Terapeuto sesijos naujo namų darbo kūrimo langas
+![](8.png)
+
+## Terapeuto sesijos namų darbo naujinimo langas
+![](9.png)
+
+## Terapeuto nerezervuotos sesijos langas
+![](10.png)
+
+## Terapeuto naujos sesijos kūrimo langas
+![](11.png)
+
+## Administratoriaus kvalifikacijų langas
+![](12.png)
+
+## Administratoriaus kvalifikacijos redagavimo langas
+![](13.png)
+
+## Administratoriaus naujos kvalifikacijos kūrimo langas
+![](14.png)

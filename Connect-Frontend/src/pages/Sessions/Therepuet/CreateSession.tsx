@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Container,
+  CssBaseline,
   FormLabel,
   Stack,
   TextareaAutosize,
@@ -83,10 +84,11 @@ const CreateSession = () => {
   if (roleId == 2) {
     return (
       <main>
+        <CssBaseline />
         <Box
           sx={{
             bgcolor: "background.paper",
-            pt: 3,
+            pt: 8,
             pb: 4,
           }}
         ></Box>

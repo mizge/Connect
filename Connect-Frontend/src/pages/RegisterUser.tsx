@@ -168,16 +168,17 @@ const RegisterUser = () => {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, background: "#8a8ac1" }}
+                sx={{ mt: 3, mb: 2 }}
               >
                 Register
               </Button>
               <Button
+                color="secondary"
                 onClick={registerTherepuet}
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mb: 2, background: "#bcbcdc" }}
+                sx={{ mb: 2 }}
               >
                 Register as therepuet
               </Button>

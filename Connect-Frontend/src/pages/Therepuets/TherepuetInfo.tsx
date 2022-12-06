@@ -19,7 +19,7 @@ import Paper from "@mui/material/Paper";
 import { StyledTableCell } from "../../components/StyledTableCell";
 import { StyledTableRow } from "../../components/StyledTableRow";
 import Typography from "@mui/material/Typography";
-import { Alert, AlertTitle, CircularProgress } from "@mui/material";
+import { Alert, AlertTitle, CircularProgress, CssBaseline } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { monthNames } from "../../components/Months";
 import Button from "@mui/material/Button";
@@ -71,11 +71,11 @@ const TherepuetInfo = (props: any) => {
   }
   return (
     <main>
-      {/* Hero unit */}
+			<CssBaseline />
       <Box
         sx={{
           bgcolor: "background.paper",
-          pt: 3,
+          pt: 13,
           pb: 4,
         }}
       ></Box>
@@ -143,7 +143,8 @@ const TherepuetInfo = (props: any) => {
                           type="button"
                           fullWidth
                           variant="contained"
-                          sx={{ mt: 3, mb: 2, background: "#cba23f", width:"50%" }}
+                          color="secondary"
+                          sx={{ mt: 3, mb: 2, color:"white", width:"50%" }}
                         >
                           Reserve this session
                         </Button>
@@ -165,10 +166,10 @@ const TherepuetInfo = (props: any) => {
       {reservationError ? (
         <Alert
           severity="error"
-          style={{ position: "fixed", bottom: "10px", right: "20px" }}
+          style={{ position: "fixed", bottom: "90px", right: "20px" }}
         >
           <AlertTitle>Error</AlertTitle>
-          Session can't be reserved.
+          Session can't be reserved. Please log in.
         </Alert>
       ) : (
         <></>

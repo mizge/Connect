@@ -9,6 +9,7 @@ import {
   Box,
   CircularProgress,
   Container,
+  CssBaseline,
   Dialog,
   DialogActions,
   DialogContent,
@@ -28,8 +29,11 @@ import { StyledTableRow } from "../../components/StyledTableRow";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { useNavigate } from "react-router-dom";
 import { sleep } from "../../helpers/Sleep";
+import { useAppSelector } from "../../app/hooks";
+import Unauthorized from "../../global/Unauthorized";
 
 const Qualifications = () => {
+  const roleId: number = useAppSelector((state) => state.user.roleId);
   const [qualifications, setQualifications] = useState<Qualification[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [open, setOpen] = useState<boolean>(false);
@@ -74,20 +78,25 @@ const Qualifications = () => {
   const handleClose = () => {
     setOpen(false);
   };
+  if(roleId != 1) {
+    return <Unauthorized />;
+  }
   return (
     <main>
+
       <Box
         sx={{
           bgcolor: "background.paper",
-          pt: 3,
+          pt: 8,
           pb: 4,
         }}
       ></Box>
+            			<CssBaseline />
       <Container sx={{ py: 1 }} maxWidth="lg">
         <Stack>
-          <h2 style={{ width: "100%", textAlign: "left", fontSize: "20px" }}>
+          <h1 style={{ width: "100%", textAlign: "left" }}>
             Qualifications
-          </h2>
+          </h1>
         </Stack>
         <br />
         <div>
@@ -192,9 +201,8 @@ const Qualifications = () => {
           severity="error"
           style={{
             position: "fixed",
-            bottom: "10px",
+            bottom: "90px",
             right: "20px",
-            width: "150px",
           }}
         >
           <AlertTitle>Failed</AlertTitle>

@@ -12,7 +12,7 @@ import { GetTherepuetResponse as Therepuet } from '../../contracts/therepuet/Get
 import { useNavigate } from 'react-router-dom';
 import therepuetsService from '../../services/therepuetService';
 import Stack from '@mui/material/Stack';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, CssBaseline } from '@material-ui/core';
 import { useAppSelector } from '../../app/hooks';
 import { useParams } from 'react-router-dom';
 import { GetQualificationResponse as Qualification } from '../../contracts/qualification/GetQualificationResponse';
@@ -45,7 +45,7 @@ const Therepuets = (props:any) => {
 	}
     return (
 		<main>	
-			{/* Hero unit */}
+			<CssBaseline />
 			<Box
 				sx={{
 					bgcolor: 'background.paper',
@@ -73,7 +73,7 @@ const Therepuets = (props:any) => {
 						therepuets.map((therepuet) => (
 								<Grid item key={therepuet.user.id} xs={12} sm={6} md={6} lg={4}>
 									<Card 
-										sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', border: "none", boxShadow: "none"}}
+										sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', border: "none", boxShadow: "none", background:"inherit"}}
 									>
 										<CardMedia
                                             style={{borderRadius: '50%', height: '75%', width:'75%'}}
@@ -90,7 +90,7 @@ const Therepuets = (props:any) => {
 											</Typography>
 										</CardContent>
 										<CardActions>
-											<Button onClick={()=>navigateToTherepuet(therepuet.user.id)} size="small">Seee available sessions</Button>
+											<Button onClick={()=>navigateToTherepuet(therepuet.user.id)} size="small">See available sessions</Button>
 										</CardActions>
 									</Card>
 								</Grid>

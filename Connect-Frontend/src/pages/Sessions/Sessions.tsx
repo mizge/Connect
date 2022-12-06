@@ -7,7 +7,7 @@ import TherepuetSessions from './Therepuet/TherepuetSessions';
 const Sessions = () => {
   const roleId:number  = useAppSelector((state) => state.user.roleId);
   if(roleId == 1){
-    return <div>Forbide</div>
+    return <Unauthorized/>
   }
   else if(roleId == 2){
     return <TherepuetSessions/>

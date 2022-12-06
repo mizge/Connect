@@ -57,14 +57,14 @@ export const AdminNav = (props:any ) =>{
           Connect
         </Typography>
 
-        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, color:"white" }} color="white">
           <IconButton
             size="large"
             aria-label="account of current user"
             aria-controls="menu-appbar"
             aria-haspopup="true"
             onClick={handleOpenNavMenu}
-            color="inherit"
+            style={{color:"white"}}
           >
             <MenuIcon />
           </IconButton>
@@ -94,7 +94,7 @@ export const AdminNav = (props:any ) =>{
           </Menu>
         </Box>
 
-        <VolunteerActivismIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+        <VolunteerActivismIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1, background:"white"}} />
         <Typography
           variant="h5"
           noWrap
@@ -107,7 +107,7 @@ export const AdminNav = (props:any ) =>{
             fontFamily: 'monospace',
             fontWeight: 700,
             letterSpacing: '.3rem',
-            color: 'inherit',
+            color: 'white',
             textDecoration: 'none',
             cursor: 'pointer'
           }}

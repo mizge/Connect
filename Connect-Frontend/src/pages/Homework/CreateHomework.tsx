@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Container,
+  CssBaseline,
   FormLabel,
   Stack,
   TextareaAutosize,
@@ -16,13 +17,13 @@ import {
 } from "@mui/material";
 import { monthNames } from "../../components/Months";
 import sessionsService from "../../services/sessionsService";
-import { Textarea } from "@mui/joy";
 import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { CreateHomeWorkRequest } from "../../contracts/homework/CreateHomeworkRequest";
 import homeworkService from "../../services/homeworkService";
 import { useNavigate } from "react-router-dom";
 import { sleep } from "../../helpers/Sleep";
+import NotFound from "../../global/NotFound";
 
 const CreateHomework = () => {
   const roleId: number = useAppSelector((state) => state.user.roleId);
@@ -41,8 +42,10 @@ const CreateHomework = () => {
     const session = await sessionsService.getTherepuetSession(
       Number(sessionId)
     );
-    setSession(session);
-    setTime(session?.startTime);
+    if(session != null){
+      setSession(session);
+      setTime(session?.startTime);
+    }
   }
   async function handleSumbit() {
     const homeworkRequest: CreateHomeWorkRequest = {
@@ -68,9 +71,12 @@ const CreateHomework = () => {
   }
 
   if (roleId == 2) {
+    if(session == null){
+      return <NotFound/>
+    }
     return (
       <main>
-        {/* Hero unit */}
+        	  <CssBaseline />
         <Box
           sx={{
             bgcolor: "background.paper",
@@ -99,10 +105,11 @@ const CreateHomework = () => {
           </Stack>
 
           <Box sx={{ mt: 1 }}>
-            <Textarea
+            <TextField
+              multiline
               minRows={4}
               aria-label="Task"
-              placeholder="Task"
+              label="Task"
               id="task"
               name="task"
               onChange={(e: any) => {
