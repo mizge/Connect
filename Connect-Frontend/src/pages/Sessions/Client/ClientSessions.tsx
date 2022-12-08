@@ -45,7 +45,7 @@ const ClientSessions = () => {
       <Box
         sx={{
           bgcolor: "background.paper",
-          pt: 3,
+          pt: 8,
           pb: 4,
         }}
       ></Box>

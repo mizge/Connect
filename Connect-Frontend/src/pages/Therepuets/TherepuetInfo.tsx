@@ -75,7 +75,7 @@ const TherepuetInfo = (props: any) => {
       <Box
         sx={{
           bgcolor: "background.paper",
-          pt: 13,
+          pt: 8,
           pb: 4,
         }}
       ></Box>

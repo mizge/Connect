@@ -18,8 +18,13 @@ class QualificationService {
 
 	async getQualifications (): Promise<GetQualificationResponse[]>
 	{
-		const response = await axios.get(qualificationUri, { headers: {} });
-		return response.data;
+		try{
+			const response = await axios.get(qualificationUri, { headers: {} });
+			return response.data;
+		}
+		catch (err) {
+			return []
+		}
 	}
 	async getQualification(id: number): Promise<GetQualificationResponse>
 	{

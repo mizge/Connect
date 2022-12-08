@@ -55,6 +55,7 @@ const FreeSession = (props: any) => {
       <Stack>
         <Grid
           sx={{
+            pt: 8,
             py: 4,
             flex: "display",
             justifyContent: "left",

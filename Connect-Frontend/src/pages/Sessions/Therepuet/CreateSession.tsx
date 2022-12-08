@@ -19,7 +19,7 @@ import {
 import { monthNames } from "../../../components/Months";
 import sessionsService from "../../../services/sessionsService";
 import { Textarea } from "@mui/joy";
-import { LocalizationProvider, MobileDatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider, MobileDatePicker, MobileDateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { CreateHomeWorkRequest } from "../../../contracts/homework/CreateHomeworkRequest";
 import homeworkService from "../../../services/homeworkService";
@@ -120,7 +120,7 @@ const CreateSession = () => {
               {numberError}
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <MobileDatePicker
+              <MobileDateTimePicker
                 label="Time"
                 minDate={minDate}
                 inputFormat="MM/DD/YYYY"
@@ -151,13 +151,12 @@ const CreateSession = () => {
             severity="error"
             style={{
               position: "fixed",
-              bottom: "10px",
+              bottom: "110px",
               right: "20px",
-              width: "150px",
             }}
           >
             <AlertTitle>Failed</AlertTitle>
-            Homework was not saved.
+            Session was not created. Time already occupied.
           </Alert>
         ) : (
           <></>

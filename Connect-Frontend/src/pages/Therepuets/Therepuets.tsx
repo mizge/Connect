@@ -48,8 +48,7 @@ const Therepuets = (props:any) => {
 			<CssBaseline />
 			<Box
 				sx={{
-					bgcolor: 'background.paper',
-					pt: 3,
+					pt: 8,
 					pb: 4,
 				}}
 			>

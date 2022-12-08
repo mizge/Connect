@@ -169,7 +169,7 @@ namespace Connect_Backend.Controllers
                                                                       SessionTimeOccupied(sessionRequest.StartTime, sessionRequest.DurationInMinutes, s.StartTime, s.DurationInMinutes))
                                                                 .ToList();
 
-            if ((!sessionsOnThisTime.Any() && sessionsOnThisTime.Count > 0) || sessionRequest.DurationInMinutes < 0)
+            if (sessionsOnThisTime.Any() || sessionRequest.DurationInMinutes < 0)
             {
                 return BadRequest(new ErrorMessage() { Message = "Session time invalid." });
             }
@@ -309,7 +309,7 @@ namespace Connect_Backend.Controllers
         {
             DateTime newEnd = newStart + TimeSpan.FromMinutes(newDuration);
             DateTime oldEnd = oldStart + TimeSpan.FromMinutes(oldDuration);
-            return !(newStart < oldStart && newEnd < oldStart) && !(newStart > oldEnd && newEnd > oldEnd);
+            return !((newStart <= oldStart && newEnd <= oldStart) || (newStart >= oldEnd && newEnd >= oldEnd));
         }
 
         private async Task<bool> SessionExists(int id)
